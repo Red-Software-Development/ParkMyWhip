@@ -1,0 +1,23 @@
+# flutter_native_splash configuration
+# Run this command to generate splash screens:
+# dart run flutter_native_splash:create
+
+flutter_native_splash:
+  # Splash screen image
+  image: assets/images/logo.png
+  
+  # Background color
+  color: "#FFFFFF"
+  
+  # Android 12+ configuration
+  android_12:
+    image: assets/images/android12_logo.png
+    color: "#FFFFFF"
+  
+  # Platform specific settings
+  android: true
+  ios: true
+  web: false
+  
+  # Fullscreen mode
+  fullscreen: true

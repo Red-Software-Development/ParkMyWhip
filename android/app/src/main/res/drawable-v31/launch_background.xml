@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This file is not used for Android 12+ -->
+<!-- Android 12+ uses the new Splash Screen API configured in values-v31/styles.xml -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Solid white background -->
+    <item>
+        <color android:color="#FFFFFF"/>
+    </item>
+    
+    <!-- This drawable is not used on Android 12+ -->
+    <!-- The splash screen is controlled by windowSplashScreenAnimatedIcon in styles.xml -->
+</layer-list>
