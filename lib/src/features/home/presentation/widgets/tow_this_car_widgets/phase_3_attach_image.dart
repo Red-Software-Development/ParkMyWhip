@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:park_my_whip/src/core/config/injection.dart';
 import 'package:park_my_whip/src/core/constants/strings.dart';
 import 'package:park_my_whip/src/core/constants/text_style.dart';
@@ -60,13 +59,13 @@ class Phase3AttachImage extends StatelessWidget {
     if (state.isImageLoading) {
       return const ImageLoadingWidget();
     }
-    
+
     if (state.selectedImagePath == null) {
       return ImagePickerButton(
         onTap: () => getIt<TowCubit>().showImageSourcePicker(context),
       );
     }
-    
+
     return ImagePreviewWidget(
       imagePath: state.selectedImagePath!,
       onChangeTap: () => getIt<TowCubit>().showImageSourcePicker(context),

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:park_my_whip/src/core/config/injection.dart';
-import 'package:park_my_whip/src/core/constants/colors.dart';
 import 'package:park_my_whip/src/core/widgets/common_app_bar_no_scaffold.dart';
 import 'package:park_my_whip/src/features/home/presentation/cubit/dashboard_cubit/dashboard_cubit.dart';
 import 'package:park_my_whip/src/features/home/presentation/cubit/tow_cubit/tow_cubit.dart';
@@ -33,31 +32,25 @@ class TowACarPage extends StatelessWidget {
             phaseWidget = const SizedBox.shrink();
         }
 
-        return Scaffold(
-          backgroundColor: AppColor.white,
-          body: SafeArea(
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24.w),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  CommonAppBarNoScaffold(
-                    onBackPress: () {
-                      if (state.currentPhase == 1) {
-                        getIt<DashboardCubit>().changePage(0);
-                      } else {
-                        getIt<TowCubit>().previousPhase();
-                      }
-                    },
-                  ),
-                  Expanded(child: phaseWidget),
-                ],
+        return Padding(
+          padding: EdgeInsets.symmetric(horizontal: 24.w),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CommonAppBarNoScaffold(
+                onBackPress: () {
+                  if (state.currentPhase == 1) {
+                    getIt<DashboardCubit>().changePage(0);
+                  } else {
+                    getIt<TowCubit>().previousPhase();
+                  }
+                },
               ),
-            ),
+              Expanded(child: phaseWidget),
+            ],
           ),
         );
       },
     );
   }
 }
-

@@ -80,7 +80,7 @@ class HomeStrings {
   static const String newTowingEntry = 'New towing entry';
   static const String enterPlateNumberTitle = 'Enter Plate Number';
   static const String plateNumber = 'Plate Number';
-  static const String plateNumberExample = 'AB12 CDE';
+  static const String plateNumberExample = 'AB12CDE';
   static const String next = 'Next';
   static const String selectViolationReason = 'Select Violation reason';
   static const String unauthorizedParking = 'Unauthorized parking';

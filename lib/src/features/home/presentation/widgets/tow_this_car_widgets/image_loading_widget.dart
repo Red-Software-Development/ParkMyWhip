@@ -20,21 +20,17 @@ class ImageLoadingWidget extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             // Small image icon
-            Icon(
-              Icons.image,
-              size: 48.sp,
-              color: AppColor.grey400,
-            ),
+            Icon(Icons.image, size: 48.sp, color: AppColor.grey400),
             SizedBox(height: 16.h),
-            // Loading indicator
-            SizedBox(
-              width: 32.w,
-              height: 32.h,
-              child: CircularProgressIndicator(
-                strokeWidth: 3.w,
-                valueColor: AlwaysStoppedAnimation<Color>(AppColor.redDark),
-              ),
-            ),
+            // // Loading indicator
+            // SizedBox(
+            //   width: 32.w,
+            //   height: 32.h,
+            //   child: CircularProgressIndicator(
+            //     strokeWidth: 3.w,
+            //     valueColor: AlwaysStoppedAnimation<Color>(AppColor.redDark),
+            //   ),
+            // ),
           ],
         ),
       ),

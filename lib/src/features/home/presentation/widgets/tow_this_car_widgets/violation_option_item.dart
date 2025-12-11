@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:park_my_whip/src/core/constants/colors.dart';
 import 'package:park_my_whip/src/core/constants/text_style.dart';
-import 'package:park_my_whip/src/core/constants/tow_my_whip_icons_icons.dart';
 
 class ViolationOptionItem extends StatelessWidget {
   const ViolationOptionItem({
@@ -24,12 +23,7 @@ class ViolationOptionItem extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 20.h),
         decoration: BoxDecoration(
-          border: Border(
-            bottom: BorderSide(
-              color: AppColor.grey300,
-              width: 1,
-            ),
-          ),
+          border: Border(bottom: BorderSide(color: AppColor.grey300, width: 1)),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -46,9 +40,11 @@ class ViolationOptionItem extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: AppColor.grey200,
-                border: Border.all(color:isSelected ? AppColor.black : AppColor.grey200,width: 7 ),
+                border: Border.all(
+                  color: isSelected ? AppColor.black : AppColor.grey200,
+                  width: 7,
+                ),
               ),
-             
             ),
           ],
         ),

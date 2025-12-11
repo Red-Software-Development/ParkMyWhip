@@ -1,11 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:park_my_whip/src/core/config/injection.dart';
-import 'package:park_my_whip/src/core/constants/colors.dart';
-import 'package:park_my_whip/src/core/constants/strings.dart';
-import 'package:park_my_whip/src/core/constants/text_style.dart';
-import 'package:park_my_whip/src/core/helpers/spacing.dart';
 import 'package:park_my_whip/src/features/home/presentation/cubit/report_cubit/reports_cubit.dart';
 import 'package:park_my_whip/src/features/home/presentation/cubit/report_cubit/reports_state.dart';
 import 'package:park_my_whip/src/features/home/presentation/widgets/reports_widgets/all_active_reports.dart';

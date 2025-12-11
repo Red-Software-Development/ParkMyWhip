@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:park_my_whip/src/core/config/injection.dart';
 import 'package:park_my_whip/src/core/constants/strings.dart';
 import 'package:park_my_whip/src/core/constants/text_style.dart';
@@ -11,10 +10,7 @@ import 'package:park_my_whip/src/features/home/presentation/widgets/tow_this_car
 import 'package:park_my_whip/src/features/home/presentation/widgets/tow_this_car_widgets/violation_option_item.dart';
 
 class Phase2SelectViolation extends StatelessWidget {
-  const Phase2SelectViolation({
-    super.key,
-    required this.state,
-  });
+  const Phase2SelectViolation({super.key, required this.state});
 
   final TowState state;
 
@@ -40,11 +36,13 @@ class Phase2SelectViolation extends StatelessWidget {
           style: AppTextStyles.urbanistFont24Grey800SemiBold1,
         ),
         verticalSpace(32),
-        ...violationOptions.map((option) => ViolationOptionItem(
-              title: option,
-              isSelected: state.selectedViolation == option,
-              onTap: () => getIt<TowCubit>().selectViolation(option),
-            )),
+        ...violationOptions.map(
+          (option) => ViolationOptionItem(
+            title: option,
+            isSelected: state.selectedViolation == option,
+            onTap: () => getIt<TowCubit>().selectViolation(option),
+          ),
+        ),
         const Spacer(),
         PhaseProgressIndicator(currentPhase: 2),
         verticalSpace(16),
