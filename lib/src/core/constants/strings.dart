@@ -72,6 +72,9 @@ class HomeStrings {
   static const String dismissAction = 'Dismiss';
   static const String filtersAction = 'Filters';
   static const String markAsTowedAction = 'Mark as Towed';
+  static const String noActiveReports = 'No Active Reports';
+  static const String noHistoryReports = 'No History Reports';
+
   // Tow a car
   static const String towACarTitle = 'Tow a car';
   static const String newTowingEntry = 'New towing entry';

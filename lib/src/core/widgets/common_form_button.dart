@@ -4,12 +4,11 @@ import 'package:park_my_whip/src/core/constants/colors.dart';
 import 'package:park_my_whip/src/core/constants/text_style.dart';
 import 'package:park_my_whip/src/core/helpers/spacing.dart';
 
-class CommonButton extends StatelessWidget {
-  const CommonButton({
+class CommonFormButton extends StatelessWidget {
+  const CommonFormButton({
     super.key,
     required this.text,
     required this.onPressed,
-    this.isEnabled = true,
     this.leadingIcon,
     this.trailingIcon,
     this.color,
@@ -17,7 +16,6 @@ class CommonButton extends StatelessWidget {
 
   final String text;
   final VoidCallback onPressed;
-  final bool isEnabled;
   final IconData? leadingIcon;
   final IconData? trailingIcon;
   final Color? color;
@@ -25,20 +23,17 @@ class CommonButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 48.h,
-
+      height: 28.h,
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: isEnabled ? onPressed : null,
+        onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: isEnabled
-              ? color ?? AppColor.richRed
-              : color?.withValues(alpha: 0.15) ?? AppColor.redLight,
+          backgroundColor: color ?? AppColor.redDark,
           disabledBackgroundColor: AppColor.redLight,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8.r),
           ),
-          padding: EdgeInsets.symmetric(vertical: 11.h),
+          padding: EdgeInsets.zero,
           elevation: 0,
         ),
         child: Row(
@@ -48,7 +43,7 @@ class CommonButton extends StatelessWidget {
               Icon(leadingIcon!, color: AppColor.white, size: 24),
               horizontalSpace(8),
             ],
-            Text(text, style: AppTextStyles.urbanistFont18WhiteRegular1_375),
+            Text(text, style: AppTextStyles.urbanistFont10WhiteMedium1),
             if (trailingIcon != null) ...[
               horizontalSpace(8),
               Icon(trailingIcon!, color: AppColor.white, size: 24),
