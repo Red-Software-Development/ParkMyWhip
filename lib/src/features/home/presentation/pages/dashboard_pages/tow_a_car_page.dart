@@ -38,6 +38,7 @@ class TowACarPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               CommonAppBarNoScaffold(
+                // todo remove logic from UI
                 onBackPress: () {
                   if (state.currentPhase == 1) {
                     getIt<DashboardCubit>().changePage(0);

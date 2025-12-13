@@ -71,7 +71,6 @@ class LoginPage extends StatelessWidget {
                   Spacer(),
                   DontHaveAccountText(),
                   verticalSpace(24),
-
                   CommonButton(
                     text: AuthStrings.login,
                     onPressed: () =>

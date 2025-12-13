@@ -55,7 +55,7 @@ class ReportsCubit extends Cubit<ReportsState> {
         reportedBy: 'Sarah Williams',
         expiredReason: 'Cancelled',
         submitTime: DateTime.now().subtract(const Duration(days: 5)),
-        carDetails: 'White Nissan Altima',
+        carDetails: 'White Nissan Ultima',
       ),
     ];
 
