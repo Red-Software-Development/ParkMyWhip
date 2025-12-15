@@ -10,6 +10,7 @@ class PatrolState extends Equatable {
   final String selectedLocation;
   final bool isLoadingLocations;
   final bool isLoadingPermits;
+  final String username;
   const PatrolState({
     this.permits = const [],
     this.isPermitSearchActive = false,
@@ -18,6 +19,7 @@ class PatrolState extends Equatable {
     this.selectedLocation = '',
     this.isLoadingLocations = false,
     this.isLoadingPermits = false,
+    this.username = 'Mohammed',
   });
 
   PatrolState copyWith({
@@ -28,6 +30,7 @@ class PatrolState extends Equatable {
     String? selectedLocation,
     bool? isLoadingLocations,
     bool? isLoadingPermits,
+    String? username,
   }) {
     return PatrolState(
       permits: permits ?? this.permits,
@@ -37,6 +40,7 @@ class PatrolState extends Equatable {
       selectedLocation: selectedLocation ?? this.selectedLocation,
       isLoadingLocations: isLoadingLocations ?? this.isLoadingLocations,
       isLoadingPermits: isLoadingPermits ?? this.isLoadingPermits,
+      username: username ?? this.username,
     );
   }
 
@@ -49,5 +53,6 @@ class PatrolState extends Equatable {
     selectedLocation,
     isLoadingLocations,
     isLoadingPermits,
+    username,
   ];
 }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:park_my_whip/src/core/config/injection.dart';
 import 'package:park_my_whip/src/core/constants/strings.dart';
 import 'package:park_my_whip/src/core/constants/text_style.dart';
 import 'package:park_my_whip/src/core/helpers/spacing.dart';
@@ -12,11 +11,14 @@ import 'package:park_my_whip/src/features/home/presentation/widgets/common/searc
 class ActivePermitPageContent extends StatelessWidget {
   const ActivePermitPageContent({
     super.key,
+    required this.cubit,
     required this.placeName,
     required this.permits,
     required this.isPermitSearchActive,
     required this.isLoading,
   });
+
+  final PatrolCubit cubit;
   final String placeName;
   final List<PermitModel> permits;
   final bool isPermitSearchActive;
@@ -28,14 +30,14 @@ class ActivePermitPageContent extends StatelessWidget {
       canPop: false,
       onPopInvokedWithResult: (didPop, result) {
         if (!didPop) {
-          getIt<PatrolCubit>().closePermit();
+          cubit.closePermit();
         }
       },
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           CommonAppBarNoScaffold(
-            onBackPress: () => getIt<PatrolCubit>().closePermit(),
+            onBackPress: cubit.closePermit,
           ),
           verticalSpace(12),
           Text(
@@ -50,10 +52,9 @@ class ActivePermitPageContent extends StatelessWidget {
           verticalSpace(12),
           SearchTextField(
             hintText: HomeStrings.searchPlateLabel,
-            controller: getIt<PatrolCubit>().searchPermitController,
+            controller: cubit.searchPermitController,
             searchActiveHint: HomeStrings.plateNumberHint,
-            onChanged: (String value) =>
-                getIt<PatrolCubit>().searchPermits(value),
+            onChanged: cubit.searchPermits,
           ),
           verticalSpace(12),
           AllActivePermitList(

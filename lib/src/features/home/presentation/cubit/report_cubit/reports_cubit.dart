@@ -1,9 +1,12 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:park_my_whip/src/core/config/injection.dart';
 import 'package:park_my_whip/src/features/home/data/models/active_reports_model.dart';
 import 'package:park_my_whip/src/features/home/data/models/history_report_model.dart';
 import 'package:park_my_whip/src/features/home/data/models/report_filter_criteria.dart';
+import 'package:park_my_whip/src/features/home/presentation/cubit/dashboard_cubit/dashboard_cubit.dart';
 import 'package:park_my_whip/src/features/home/presentation/cubit/report_cubit/reports_state.dart';
 import 'package:park_my_whip/src/features/home/presentation/helpers/report_filter_helper.dart';
+import 'package:park_my_whip/src/features/home/presentation/widgets/common/filter_section.dart';
 
 class ReportsCubit extends Cubit<ReportsState> {
   ReportsCubit() : super(const ReportsState());
@@ -281,5 +284,31 @@ class ReportsCubit extends Cubit<ReportsState> {
     }
 
     applyFilter(newCriteria);
+  }
+
+  /// Returns active filter labels for history tab filter section
+  List<FilterChipData> getActiveFilterLabels() {
+    return ReportFilterHelper.getActiveFilters(state.filterCriteria);
+  }
+
+  /// Handles back button press and navigation logic
+  void handleBackPress(int currentTabIndex, Function(int) animateToTab) {
+    if (currentTabIndex == 1) {
+      // On history tab, go back to active tab
+      animateToTab(0);
+    } else {
+      // On active tab, go to patrol
+      getIt<DashboardCubit>().changePage(0);
+    }
+  }
+
+  /// Handles tab changes and loads appropriate data
+  void onTabChanged(int tabIndex) {
+    if (tabIndex == 0) {
+      loadActiveReports();
+    } else if (tabIndex == 1) {
+      resetFilter();
+      loadHistoryReports();
+    }
   }
 }

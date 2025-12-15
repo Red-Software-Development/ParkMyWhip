@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:park_my_whip/src/core/config/injection.dart';
 import 'package:park_my_whip/src/core/constants/strings.dart';
 import 'package:park_my_whip/src/core/constants/text_style.dart';
 import 'package:park_my_whip/src/core/helpers/spacing.dart';
@@ -12,10 +11,14 @@ import 'package:park_my_whip/src/features/home/presentation/widgets/common/searc
 class PatrolPageContent extends StatelessWidget {
   const PatrolPageContent({
     super.key,
+    required this.cubit,
+    required this.username,
     required this.locations,
     required this.isLoading,
   });
 
+  final PatrolCubit cubit;
+  final String username;
   final List<LocationModel> locations;
   final bool isLoading;
 
@@ -28,7 +31,7 @@ class PatrolPageContent extends StatelessWidget {
         LogoAndAppName(),
         verticalSpace(8),
         Text(
-          '${HomeStrings.greeting} Mohammed!',
+          '${HomeStrings.greeting} $username!',
           style: AppTextStyles.urbanistFont18Grey800SemiBold1_25,
         ),
         verticalSpace(35),
@@ -39,8 +42,8 @@ class PatrolPageContent extends StatelessWidget {
         verticalSpace(16),
         SearchTextField(
           hintText: HomeStrings.searchSiteHint,
-          controller: getIt<PatrolCubit>().searchPatrolController,
-          onChanged: (value) => getIt<PatrolCubit>().searchLocations(value),
+          controller: cubit.searchPatrolController,
+          onChanged: cubit.searchLocations,
           searchActiveHint: HomeStrings.searchSiteHint,
         ),
         verticalSpace(20),

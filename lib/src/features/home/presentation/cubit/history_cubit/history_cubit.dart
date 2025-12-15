@@ -1,8 +1,11 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:park_my_whip/src/core/config/injection.dart';
 import 'package:park_my_whip/src/features/home/data/models/towing_entry_model.dart';
 import 'package:park_my_whip/src/features/home/data/models/report_filter_criteria.dart';
+import 'package:park_my_whip/src/features/home/presentation/cubit/dashboard_cubit/dashboard_cubit.dart';
 import 'package:park_my_whip/src/features/home/presentation/cubit/history_cubit/history_state.dart';
 import 'package:park_my_whip/src/features/home/presentation/helpers/towing_filter_helper.dart';
+import 'package:park_my_whip/src/features/home/presentation/widgets/common/filter_section.dart';
 
 class HistoryCubit extends Cubit<HistoryState> {
   HistoryCubit() : super(const HistoryState());
@@ -154,5 +157,20 @@ class HistoryCubit extends Cubit<HistoryState> {
 
   void backToList() {
     emit(state.copyWith(selectedEntry: null, showDetail: false));
+  }
+
+  /// Handles back button press - navigates to patrol if needed
+  void handleBackPress() {
+    if (state.showDetail) {
+      backToList();
+    } else {
+      resetFilter();
+      getIt<DashboardCubit>().changePage(0);
+    }
+  }
+
+  /// Returns active filter labels for display
+  List<FilterChipData> getActiveFilterLabels() {
+    return TowingFilterHelper.getActiveFilters(state.filterCriteria);
   }
 }

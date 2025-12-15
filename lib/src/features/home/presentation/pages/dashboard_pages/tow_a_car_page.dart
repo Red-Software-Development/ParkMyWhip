@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:park_my_whip/src/core/config/injection.dart';
 import 'package:park_my_whip/src/core/widgets/common_app_bar_no_scaffold.dart';
-import 'package:park_my_whip/src/features/home/presentation/cubit/dashboard_cubit/dashboard_cubit.dart';
 import 'package:park_my_whip/src/features/home/presentation/cubit/tow_cubit/tow_cubit.dart';
 import 'package:park_my_whip/src/features/home/presentation/cubit/tow_cubit/tow_state.dart';
 import 'package:park_my_whip/src/features/home/presentation/helpers/phase_widget_builder.dart';
@@ -11,15 +9,6 @@ import 'package:park_my_whip/src/features/home/presentation/widgets/tow_this_car
 
 class TowACarPage extends StatelessWidget {
   const TowACarPage({super.key});
-
-  void _handleBackPress(TowState state) {
-    if (state.currentPhase == 1) {
-      getIt<TowCubit>().backToPatrol();
-      getIt<DashboardCubit>().changePage(0);
-    } else {
-      getIt<TowCubit>().previousPhase();
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,16 +18,26 @@ class TowACarPage extends StatelessWidget {
           return const Phase6Success();
         }
 
-        return Padding(
-          padding: EdgeInsets.symmetric(horizontal: 24.w),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              CommonAppBarNoScaffold(
-                onBackPress: () => _handleBackPress(state),
-              ),
-              Expanded(child: PhaseWidgetBuilder.build(state)),
-            ],
+        final cubit = context.read<TowCubit>();
+
+        return PopScope(
+          canPop: false,
+          onPopInvoked: (didPop) {
+            if (!didPop) {
+              cubit.handleBackPress();
+            }
+          },
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 24.w),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                CommonAppBarNoScaffold(
+                  onBackPress: cubit.handleBackPress,
+                ),
+                Expanded(child: PhaseWidgetBuilder.build(state)),
+              ],
+            ),
           ),
         );
       },

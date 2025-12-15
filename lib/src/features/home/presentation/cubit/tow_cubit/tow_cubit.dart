@@ -2,8 +2,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:park_my_whip/src/core/config/injection.dart';
 import 'package:park_my_whip/src/features/auth/domain/validators.dart';
 import 'package:park_my_whip/src/features/home/data/models/towing_entry_model.dart';
+import 'package:park_my_whip/src/features/home/presentation/cubit/dashboard_cubit/dashboard_cubit.dart';
 import 'package:park_my_whip/src/features/home/presentation/cubit/tow_cubit/tow_state.dart';
 import 'package:park_my_whip/src/features/home/presentation/widgets/tow_this_car_widgets/image_source_bottom_sheet.dart';
 
@@ -191,7 +193,16 @@ class TowCubit extends Cubit<TowState> {
   /// Navigates back to patrol page from any phase including success screen.
   void backToPatrol() {
     resetState();
-    // Note: Navigation to patrol page (changePage(0)) should be called from the UI
+  }
+
+  /// Handles back button press - navigates to patrol if needed
+  void handleBackPress() {
+    if (state.currentPhase == 1 || state.currentPhase == 6) {
+      backToPatrol();
+      getIt<DashboardCubit>().changePage(0);
+    } else {
+      previousPhase();
+    }
   }
 
   /// Navigates directly to a specific phase when it falls within 1-5.

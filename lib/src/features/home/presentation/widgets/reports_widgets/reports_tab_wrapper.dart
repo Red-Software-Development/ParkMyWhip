@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:park_my_whip/src/core/config/injection.dart';
 import 'package:park_my_whip/src/features/home/presentation/cubit/report_cubit/reports_cubit.dart';
 import 'package:park_my_whip/src/features/home/presentation/cubit/report_cubit/reports_state.dart';
 import 'package:park_my_whip/src/features/home/presentation/widgets/reports_widgets/all_active_reports.dart';
@@ -9,10 +8,12 @@ import 'package:park_my_whip/src/features/home/presentation/widgets/reports_widg
 import 'package:park_my_whip/src/core/helpers/spacing.dart';
 import 'package:park_my_whip/src/features/home/presentation/widgets/reports_widgets/filter_bottom_sheet.dart';
 import 'package:park_my_whip/src/features/home/presentation/widgets/common/filter_section.dart';
-import 'package:park_my_whip/src/features/home/presentation/helpers/report_filter_helper.dart';
 
 class ReportsTabWrapper extends StatefulWidget {
-  const ReportsTabWrapper({super.key});
+  final ReportsCubit cubit;
+  final Widget Function(BuildContext context, int currentTabIndex, VoidCallback onBackPress)? builder;
+  
+  const ReportsTabWrapper({super.key, required this.cubit, this.builder});
 
   @override
   State<ReportsTabWrapper> createState() => _ReportsTabWrapperState();
@@ -20,28 +21,27 @@ class ReportsTabWrapper extends StatefulWidget {
 
 class _ReportsTabWrapperState extends State<ReportsTabWrapper>
     with SingleTickerProviderStateMixin {
-  late final ReportsCubit _reportsCubit;
   late TabController _controller;
 
   @override
   void initState() {
     super.initState();
-    _reportsCubit = getIt<ReportsCubit>();
     _controller = TabController(length: 2, vsync: this);
     _controller.addListener(_onTabChanged);
 
     // Kick off loading immediately so the shimmer shows before any cached data renders.
-    _reportsCubit.loadActiveReports();
+    widget.cubit.loadActiveReports();
   }
 
   void _onTabChanged() {
     if (_controller.indexIsChanging) return;
-    if (_controller.index == 0) {
-      _reportsCubit.loadActiveReports();
-    } else if (_controller.index == 1) {
-      _reportsCubit.resetFilter();
-      _reportsCubit.loadHistoryReports();
-    }
+    widget.cubit.onTabChanged(_controller.index);
+  }
+
+  void _handleBackPress() {
+    widget.cubit.handleBackPress(_controller.index, (tabIndex) {
+      _controller.animateTo(tabIndex);
+    });
   }
 
   @override
@@ -53,7 +53,7 @@ class _ReportsTabWrapperState extends State<ReportsTabWrapper>
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
+    final content = Expanded(
       child: Column(
         children: [
           /// ----- TAB BAR -----
@@ -66,12 +66,10 @@ class _ReportsTabWrapperState extends State<ReportsTabWrapper>
             builder: (context, child) {
               return _controller.index == 1
                   ? BlocBuilder<ReportsCubit, ReportsState>(
-                      bloc: _reportsCubit,
+                      bloc: widget.cubit,
                       builder: (context, state) {
                         return FilterSection(
-                          activeFilters: ReportFilterHelper.getActiveFilters(
-                            state.filterCriteria,
-                          ),
+                          activeFilters: widget.cubit.getActiveFilterLabels(),
                           onFilterPressed: () {
                             showModalBottomSheet(
                               context: context,
@@ -80,13 +78,13 @@ class _ReportsTabWrapperState extends State<ReportsTabWrapper>
                               builder: (context) => FilterBottomSheet(
                                 currentCriteria: state.filterCriteria,
                                 onApplyFilter: (criteria) {
-                                  _reportsCubit.applyFilter(criteria);
+                                  widget.cubit.applyFilter(criteria);
                                 },
                               ),
                             );
                           },
                           onRemoveFilter: (filterType) {
-                            _reportsCubit.removeFilter(filterType);
+                            widget.cubit.removeFilter(filterType);
                           },
                         );
                       },
@@ -95,7 +93,7 @@ class _ReportsTabWrapperState extends State<ReportsTabWrapper>
             },
           ),
           BlocBuilder<ReportsCubit, ReportsState>(
-            bloc: _reportsCubit,
+            bloc: widget.cubit,
             builder: (context, state) {
               return Expanded(
                 child: TabBarView(
@@ -117,5 +115,16 @@ class _ReportsTabWrapperState extends State<ReportsTabWrapper>
         ],
       ),
     );
+
+    if (widget.builder != null) {
+      return Column(
+        children: [
+          widget.builder!(context, _controller.index, _handleBackPress),
+          content,
+        ],
+      );
+    }
+    
+    return content;
   }
 }

@@ -13,21 +13,24 @@ class PatrolPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
-      onTap: () {
-        FocusScope.of(context).unfocus();
-      },
+      onTap: () => FocusScope.of(context).unfocus(),
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 20.w),
         child: BlocBuilder<PatrolCubit, PatrolState>(
           builder: (context, state) {
+            final cubit = context.read<PatrolCubit>();
+            
             return state.showPermit
                 ? ActivePermitPageContent(
+                    cubit: cubit,
                     placeName: state.selectedLocation,
                     permits: state.permits,
                     isPermitSearchActive: state.isPermitSearchActive,
                     isLoading: state.isLoadingPermits,
                   )
                 : PatrolPageContent(
+                    cubit: cubit,
+                    username: state.username,
                     locations: state.locations,
                     isLoading: state.isLoadingLocations,
                   );
