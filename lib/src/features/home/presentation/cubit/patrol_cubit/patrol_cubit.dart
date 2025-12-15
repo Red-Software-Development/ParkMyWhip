@@ -7,7 +7,9 @@ import 'package:park_my_whip/src/features/home/presentation/cubit/dashboard_cubi
 import 'package:park_my_whip/src/features/home/presentation/cubit/patrol_cubit/patrol_state.dart';
 
 class PatrolCubit extends Cubit<PatrolState> {
-  PatrolCubit() : super(const PatrolState());
+  PatrolCubit() : super(const PatrolState()) {
+    loadLocationData();
+  }
 
   final TextEditingController searchPatrolController = TextEditingController();
 

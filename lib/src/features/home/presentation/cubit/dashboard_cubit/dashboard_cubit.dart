@@ -21,7 +21,7 @@ class DashboardCubit extends Cubit<DashboardState> {
 
   final List<Widget> homeBodes = [
     BlocProvider.value(
-      value: getIt<PatrolCubit>()..loadLocationData(),
+      value: getIt<PatrolCubit>(),
       child: const PatrolPage(),
     ),
     BlocProvider.value(
