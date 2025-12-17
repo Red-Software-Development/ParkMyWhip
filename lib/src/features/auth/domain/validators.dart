@@ -4,9 +4,15 @@ class Validators {
       return 'You need to fill this field';
     }
 
+    final trimmedValue = value.trim();
+
+    // Check minimum length (at least 2 characters)
+    if (trimmedValue.length < 2) {
+      return 'Name must be at least 2 characters';
+    }
+
     // Split by spaces and filter out empty strings
-    final nameParts = value
-        .trim()
+    final nameParts = trimmedValue
         .split(' ')
         .where((part) => part.isNotEmpty)
         .toList();
@@ -15,12 +21,10 @@ class Validators {
       return 'Please enter both first and last name';
     }
 
-    // Check if all parts contain only letters
-    final validCharacters = RegExp(r'^[a-zA-Z]+$');
-    for (final part in nameParts) {
-      if (!validCharacters.hasMatch(part)) {
-        return 'Name should only contain letters';
-      }
+    // Allow letters, spaces, hyphens, and apostrophes (for names like O'Brien, Mary-Jane)
+    final validCharacters = RegExp(r"^[a-zA-Z\s\-']+$");
+    if (!validCharacters.hasMatch(trimmedValue)) {
+      return 'Name should only contain letters, spaces, hyphens, and apostrophes';
     }
 
     return null;

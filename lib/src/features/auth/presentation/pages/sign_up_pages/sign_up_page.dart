@@ -58,14 +58,22 @@ class SignUpPage extends StatelessWidget {
                     validator: (_) => state.signUpEmailError,
                     onChanged: (_) => getIt<AuthCubit>().onSignUpFieldChanged(),
                   ),
+                  verticalSpace(4),
+                  Visibility(
+                    visible: state.errorMessage != null,
+                    child: Text(
+                      state.errorMessage ?? '',
+                      style: AppTextStyles.urbanistFont12Red500Regular1_5,
+                    ),
+                  ),
                   const Spacer(),
                   AlreadyHaveAccountText(),
                   verticalSpace(16),
                   CommonButton(
-                    text: AuthStrings.continueText,
+                    text: state.isLoading ? 'Sending OTP...' : AuthStrings.continueText,
                     onPressed: () =>
                         getIt<AuthCubit>().validateSignupForm(context: context),
-                    isEnabled: state.isSignUpButtonEnabled,
+                    isEnabled: state.isSignUpButtonEnabled && !state.isLoading,
                   ),
                   verticalSpace(16),
                 ],

@@ -5,4 +5,7 @@ class RoutesName {
   static const createPassword = '/create-password';
   static const dashboard = '/dashboard';
   static const login = '/login';
+  static const forgotPassword = '/forgot-password';
+  static const resetLinkSent = '/reset-link-sent';
+  static const resetPassword = '/reset-password';
 }

@@ -30,6 +30,22 @@ class AuthStrings {
   static const String dontHaveAccount = 'Do not have an account? ';
   static const String signUp = 'Signup';
   static const String login = 'Login';
+
+  // Forgot Password
+  static const String confirmYourEmail = 'Confirm your email';
+  static const String resetPasswordSubtitle = "We'll email you a link to reset your password";
+  static const String resetLinkSent = 'Reset Link Sent';
+  static const String resetLinkSentSubtitle = "You should receive an email in your inbox shortly to reset your account's password";
+  static const String goToLogin = 'Go to login';
+  static const String resend = 'Resend';
+  static const String resendIn = 'Resend in';
+  
+  // Reset Password
+  static const String resetYourPassword = 'Reset your password';
+  static const String passwordMinCharacters = 'Be a minimum of 12 characters';
+  static const String passwordUppercase = 'Include at least one uppercase letter (A-Z)';
+  static const String passwordLowercase = 'Include at least one lowercase (a-z)';
+  static const String passwordNumber = 'Include at least one number (0-9)';
 }
 
 class FirebaseStrings {

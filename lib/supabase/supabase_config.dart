@@ -2,7 +2,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/foundation.dart';
 
 /// Generic Supabase configuration template
-/// Replace YOUR_SUPABASE_URL and YOUR_SUPABASE_ANON_KEY with your actual values
+/// Replace YOUR_ and YOUR_ with your actual values
 class SupabaseConfig {
   static const String supabaseUrl = 'https://iwvwieznrsokscxibgiw.supabase.co';
   static const String anonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml3dndpZXpucnNva3NjeGliZ2l3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU4MDY5OTYsImV4cCI6MjA4MTM4Mjk5Nn0.D0JiKreqxqLrTKohszYXQWaS-cQsAdmiaYIePQCSBFU';

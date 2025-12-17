@@ -61,5 +61,20 @@
 		<!-- Photo Library Add permission (iOS 11+) -->
 		<key>NSPhotoLibraryAddUsageDescription</key>
 		<string>ParkMyWhip needs permission to save photos of vehicles to your photo library for parking violation documentation.</string>
+		
+		<!-- Deep Link Configuration -->
+		<key>CFBundleURLTypes</key>
+		<array>
+			<dict>
+				<key>CFBundleTypeRole</key>
+				<string>Editor</string>
+				<key>CFBundleURLName</key>
+				<string>com.parkmywhip.app</string>
+				<key>CFBundleURLSchemes</key>
+				<array>
+					<string>parkmywhip</string>
+				</array>
+			</dict>
+		</array>
 	</dict>
 </plist>

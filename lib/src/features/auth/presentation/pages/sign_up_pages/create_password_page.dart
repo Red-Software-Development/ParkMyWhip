@@ -54,14 +54,22 @@ class CreatePasswordPage extends StatelessWidget {
                         getIt<AuthCubit>().onCreatePasswordFieldChanged(),
                     isPassword: true,
                   ),
+                  verticalSpace(4),
+                  Visibility(
+                    visible: state.errorMessage != null,
+                    child: Text(
+                      state.errorMessage ?? '',
+                      style: AppTextStyles.urbanistFont12Red500Regular1_5,
+                    ),
+                  ),
                   verticalSpace(24),
 
                   Spacer(),
                   CommonButton(
-                    text: AuthStrings.continueText,
+                    text: state.isLoading ? 'Creating Account...' : AuthStrings.continueText,
                     onPressed: () => getIt<AuthCubit>()
                         .validateCreatePasswordForm(context: context),
-                    isEnabled: state.isCreatePasswordButtonEnabled,
+                    isEnabled: state.isCreatePasswordButtonEnabled && !state.isLoading,
                   ),
 
                   verticalSpace(16),

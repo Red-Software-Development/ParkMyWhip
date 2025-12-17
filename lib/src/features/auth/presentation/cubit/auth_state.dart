@@ -19,6 +19,17 @@ class AuthState extends Equatable {
   final String? loginPasswordError;
   final String? loginGeneralError;
   final bool isLoginButtonEnabled;
+  // forgot password
+  final String? forgotPasswordEmailError;
+  final bool isForgotPasswordButtonEnabled;
+  // reset link sent (timer state)
+  final int resendCountdownSeconds;
+  final bool canResendEmail;
+  // reset password
+  final String? resetPasswordError;
+  final String? resetConfirmPasswordError;
+  final bool isResetPasswordButtonEnabled;
+  final String? passwordResetToken;
 
   const AuthState({
     this.isLoading = false,
@@ -35,6 +46,14 @@ class AuthState extends Equatable {
     this.loginPasswordError,
     this.loginGeneralError,
     this.isLoginButtonEnabled = false,
+    this.forgotPasswordEmailError,
+    this.isForgotPasswordButtonEnabled = false,
+    this.resendCountdownSeconds = 60,
+    this.canResendEmail = false,
+    this.resetPasswordError,
+    this.resetConfirmPasswordError,
+    this.isResetPasswordButtonEnabled = false,
+    this.passwordResetToken,
   });
 
   AuthState copyWith({
@@ -52,6 +71,14 @@ class AuthState extends Equatable {
     String? loginPasswordError,
     String? loginGeneralError,
     bool? isLoginButtonEnabled,
+    String? forgotPasswordEmailError,
+    bool? isForgotPasswordButtonEnabled,
+    int? resendCountdownSeconds,
+    bool? canResendEmail,
+    String? resetPasswordError,
+    String? resetConfirmPasswordError,
+    bool? isResetPasswordButtonEnabled,
+    String? passwordResetToken,
   }) {
     return AuthState(
       isLoading: isLoading ?? this.isLoading,
@@ -70,6 +97,15 @@ class AuthState extends Equatable {
       loginPasswordError: loginPasswordError,
       isLoginButtonEnabled: isLoginButtonEnabled ?? this.isLoginButtonEnabled,
       loginGeneralError: loginGeneralError,
+      forgotPasswordEmailError: forgotPasswordEmailError,
+      isForgotPasswordButtonEnabled:
+          isForgotPasswordButtonEnabled ?? this.isForgotPasswordButtonEnabled,
+      resendCountdownSeconds: resendCountdownSeconds ?? this.resendCountdownSeconds,
+      canResendEmail: canResendEmail ?? this.canResendEmail,
+      resetPasswordError: resetPasswordError,
+      resetConfirmPasswordError: resetConfirmPasswordError,
+      isResetPasswordButtonEnabled: isResetPasswordButtonEnabled ?? this.isResetPasswordButtonEnabled,
+      passwordResetToken: passwordResetToken ?? this.passwordResetToken,
     );
   }
 
@@ -89,5 +125,13 @@ class AuthState extends Equatable {
     loginPasswordError,
     loginGeneralError,
     isLoginButtonEnabled,
+    forgotPasswordEmailError,
+    isForgotPasswordButtonEnabled,
+    resendCountdownSeconds,
+    canResendEmail,
+    resetPasswordError,
+    resetConfirmPasswordError,
+    isResetPasswordButtonEnabled,
+    passwordResetToken,
   ];
 }

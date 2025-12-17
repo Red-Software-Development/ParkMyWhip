@@ -1,6 +1,8 @@
 import 'package:get_it/get_it.dart';
 import 'package:park_my_whip/src/core/helpers/shared_pref_helper.dart';
 import 'package:park_my_whip/src/core/services/supabase_user_service.dart';
+import 'package:park_my_whip/src/features/auth/data/data_sources/auth_remote_data_source.dart';
+import 'package:park_my_whip/src/features/auth/data/data_sources/supabase_auth_remote_data_source.dart';
 import 'package:park_my_whip/src/features/auth/domain/validators.dart';
 import 'package:park_my_whip/src/features/auth/presentation/cubit/auth_cubit.dart';
 import 'package:park_my_whip/src/features/home/presentation/cubit/dashboard_cubit/dashboard_cubit.dart';
@@ -23,6 +25,11 @@ void setupDependencyInjection() {
     () => SupabaseUserService(sharedPrefHelper: getIt<SharedPrefHelper>()),
   );
 
+  // Data Sources
+  getIt.registerLazySingleton<AuthRemoteDataSource>(
+    () => SupabaseAuthRemoteDataSource(),
+  );
+
   // Repositories
 
   // Use Cases
@@ -35,6 +42,7 @@ void setupDependencyInjection() {
     () => AuthCubit(
       validators: getIt<Validators>(),
       supabaseUserService: getIt<SupabaseUserService>(),
+      authRemoteDataSource: getIt<AuthRemoteDataSource>(),
     ),
   );
 

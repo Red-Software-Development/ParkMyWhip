@@ -405,4 +405,12 @@ class AppTextStyles {
     height: 1.2, // 120%
     letterSpacing: 0,
   );
+
+  static TextStyle urbanistFont14Grey600Regular1_5 = GoogleFonts.urbanist(
+    fontSize: 14.sp,
+    fontWeight: FontWeightHelper.regular,
+    color: AppColor.grey700, // Using grey700 as grey600 is not defined
+    height: 1.5, // 150%
+    letterSpacing: 0,
+  );
 }
