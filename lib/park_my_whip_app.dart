@@ -36,6 +36,10 @@ class _ParkMyWhipAppState extends State<ParkMyWhipApp> {
           onGenerateRoute: AppRouter.generate,
           initialRoute: RoutesName.initial,
           theme: AppTheme.lightTheme,
+          onGenerateInitialRoutes: (String initialRoute) {
+            // Always start with login page, let DeepLinkService handle deep links
+            return [AppRouter.generate(const RouteSettings(name: RoutesName.initial))];
+          },
         );
       },
     );
