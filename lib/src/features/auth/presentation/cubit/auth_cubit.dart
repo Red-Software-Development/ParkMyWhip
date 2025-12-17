@@ -450,27 +450,25 @@ class AuthCubit extends Cubit<app_auth.AuthState> {
 
   //************************************ deep link handling ************************** */
   /// Handle password reset deep link from mobile (iOS/Android)
+  /// Supports two token types:
+  /// - accessToken: Full JWT from Supabase auth URL
+  /// - tokenHash: Short numeric code from email template
   Future<void> handlePasswordResetDeepLink({
     required BuildContext context,
-    required String accessToken,
+    String? accessToken,
+    String? tokenHash,
     required String refreshToken,
     required String type,
   }) async {
-    debugPrint('AuthCubit: Handling password reset deep link - token: ${accessToken.isNotEmpty ? 'present' : 'missing'}, type: $type');
+    debugPrint('AuthCubit: Handling password reset deep link - accessToken: ${accessToken != null ? 'present' : 'missing'}, tokenHash: ${tokenHash != null ? 'present' : 'missing'}, type: $type');
     
     try {
-      // Verify the recovery token from the email link to get a valid session
-      // The token from Supabase email is a tokenHash (short numeric code)
-      final response = await SupabaseConfig.client.auth.verifyOTP(
-        tokenHash: accessToken,
-        type: OtpType.recovery,
-      );
-      
-      debugPrint('AuthCubit: Token verified successfully - session: ${response.session != null ? 'present' : 'missing'}');
-      
-      if (response.session != null) {
-        // Session established, navigate to reset password page
-        // No need to store token - user is already authenticated
+      // If we have a full access token (JWT), use setSession
+      if (accessToken != null && accessToken.isNotEmpty) {
+        debugPrint('AuthCubit: Using setSession with access token');
+        await SupabaseConfig.client.auth.setSession(accessToken);
+        
+        debugPrint('AuthCubit: Session set successfully');
         emit(state.copyWith(isLoading: false));
         
         Navigator.pushNamedAndRemoveUntil(
@@ -478,9 +476,34 @@ class AuthCubit extends Cubit<app_auth.AuthState> {
           RoutesName.resetPassword,
           (route) => false,
         );
-      } else {
-        debugPrint('AuthCubit: No session returned from verifyOTP');
+        return;
       }
+      
+      // If we have a token hash, use verifyOTP
+      if (tokenHash != null && tokenHash.isNotEmpty) {
+        debugPrint('AuthCubit: Using verifyOTP with token hash');
+        final response = await SupabaseConfig.client.auth.verifyOTP(
+          tokenHash: tokenHash,
+          type: OtpType.recovery,
+        );
+        
+        debugPrint('AuthCubit: Token verified successfully - session: ${response.session != null ? 'present' : 'missing'}');
+        
+        if (response.session != null) {
+          emit(state.copyWith(isLoading: false));
+          
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            RoutesName.resetPassword,
+            (route) => false,
+          );
+        } else {
+          debugPrint('AuthCubit: No session returned from verifyOTP');
+        }
+        return;
+      }
+      
+      debugPrint('AuthCubit: No valid token provided');
     } catch (e) {
       debugPrint('AuthCubit: Error verifying token from deep link: $e');
     }
