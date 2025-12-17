@@ -9,7 +9,7 @@ void main() async {
 
   await SupabaseConfig.initialize();
   setupDependencyInjection();
-  DeepLinkService.initialize();
+  await DeepLinkService.initialize();
 
   runApp(const ParkMyWhipApp());
 }
