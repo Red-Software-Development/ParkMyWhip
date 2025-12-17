@@ -460,16 +460,13 @@ class AuthCubit extends Cubit<app_auth.AuthState> {
     try {
       emit(state.copyWith(isLoading: true));
       
-      // Exchange the code for a session using verifyOTP
-      // The code from Supabase's email link is a PKCE code
-      log('Exchanging code for session tokens', name: 'AuthCubit', level: 800);
-      final response = await SupabaseConfig.client.auth.verifyOTP(
-        type: OtpType.recovery,
-        token: code,
-      );
+      // Exchange the PKCE code for a valid session
+      // Supabase uses PKCE flow: the code needs to be exchanged for tokens
+      log('Exchanging PKCE code for session', name: 'AuthCubit', level: 800);
+      final response = await SupabaseConfig.client.auth.exchangeCodeForSession(code);
       
-      if (response.user != null) {
-        log('Code verified successfully for user: ${response.user!.id}', name: 'AuthCubit', level: 1000);
+      if (response.session != null) {
+        log('Session established successfully for user: ${response.session!.user.id}', name: 'AuthCubit', level: 1000);
         emit(state.copyWith(isLoading: false));
         
         // Navigate to reset password page
@@ -481,10 +478,10 @@ class AuthCubit extends Cubit<app_auth.AuthState> {
           );
         }
       } else {
-        throw Exception('Failed to verify code');
+        throw Exception('Failed to exchange code for session');
       }
     } catch (e) {
-      log('Error verifying code from deep link: $e', name: 'AuthCubit', level: 900, error: e);
+      log('Error exchanging code: $e', name: 'AuthCubit', level: 900, error: e);
       emit(state.copyWith(
         isLoading: false,
         resetPasswordError: 'Failed to verify reset link. Please request a new one.',
