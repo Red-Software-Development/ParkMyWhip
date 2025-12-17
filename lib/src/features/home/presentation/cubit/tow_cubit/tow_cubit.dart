@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -126,7 +127,7 @@ class TowCubit extends Cubit<TowState> {
         emit(state.copyWith(isImageLoading: false));
       }
     } catch (e) {
-      debugPrint('Error picking image: $e');
+      log('Error picking image: $e', name: 'TowCubit', level: 900, error: e);
       emit(state.copyWith(isImageLoading: false));
     }
   }
@@ -173,7 +174,7 @@ class TowCubit extends Cubit<TowState> {
       final plateNumber = state.towingEntry?.plateNumber ?? 'Unknown';
       
       // TODO: Replace with actual repository call to save towing entry
-      debugPrint('Towing entry confirmed: ${state.towingEntry?.toJson()}');
+      log('Towing entry confirmed: ${state.towingEntry?.toJson()}', name: 'TowCubit', level: 1000);
 
       emit(state.copyWith(
         isLoading: false,
@@ -182,7 +183,7 @@ class TowCubit extends Cubit<TowState> {
         currentPhase: 6,
       ));
     } catch (e) {
-      debugPrint('Error confirming towing: $e');
+      log('Error confirming towing: $e', name: 'TowCubit', level: 900, error: e);
       emit(state.copyWith(
         isLoading: false,
         errorMessage: 'Failed to confirm towing: ${e.toString()}',

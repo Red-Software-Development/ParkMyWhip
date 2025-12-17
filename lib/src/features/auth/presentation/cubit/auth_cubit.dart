@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:park_my_whip/src/core/networking/network_exceptions.dart';
@@ -96,7 +96,7 @@ class AuthCubit extends Cubit<app_auth.AuthState> {
       // Call data source to send OTP
       await authRemoteDataSource.sendSignUpOtp(email: email);
 
-      debugPrint('AuthCubit: OTP sent successfully to $email');
+      log('OTP sent successfully to $email', name: 'AuthCubit', level: 800);
 
       // Navigate to OTP page
       emit(state.copyWith(isLoading: false));
@@ -104,7 +104,7 @@ class AuthCubit extends Cubit<app_auth.AuthState> {
         Navigator.pushNamed(context, RoutesName.enterOtpCode);
       }
     } catch (e) {
-      debugPrint('AuthCubit: Send OTP error: $e');
+      log('Send OTP error: $e', name: 'AuthCubit', level: 900, error: e);
       final errorMessage = NetworkExceptions.getSupabaseExceptionMessage(e);
       emit(state.copyWith(
         isLoading: false,
@@ -200,7 +200,7 @@ class AuthCubit extends Cubit<app_auth.AuthState> {
         otp: otp,
       );
 
-      debugPrint('AuthCubit: Signup completed successfully. User: ${supabaseUser.id}');
+      log('Signup completed successfully. User: ${supabaseUser.id}', name: 'AuthCubit', level: 1000);
 
       // Save user data to local storage
       await supabaseUserService.cacheUser(supabaseUser);
@@ -211,7 +211,7 @@ class AuthCubit extends Cubit<app_auth.AuthState> {
         Navigator.pushReplacementNamed(context, RoutesName.dashboard);
       }
     } catch (e) {
-      debugPrint('AuthCubit: Complete signup error: $e');
+      log('Complete signup error: $e', name: 'AuthCubit', level: 900, error: e);
       final errorMessage = NetworkExceptions.getSupabaseExceptionMessage(e);
       emit(state.copyWith(
         isLoading: false,
@@ -275,7 +275,7 @@ class AuthCubit extends Cubit<app_auth.AuthState> {
         password: password,
       );
 
-      debugPrint('AuthCubit: User logged in successfully: ${supabaseUser.id}');
+      log('User logged in successfully: ${supabaseUser.id}', name: 'AuthCubit', level: 1000);
 
       // Save user data to local storage
       await supabaseUserService.cacheUser(supabaseUser);
@@ -286,7 +286,7 @@ class AuthCubit extends Cubit<app_auth.AuthState> {
         Navigator.pushReplacementNamed(context, RoutesName.dashboard);
       }
     } catch (e) {
-      debugPrint('AuthCubit: Login error: $e');
+      log('Login error: $e', name: 'AuthCubit', level: 900, error: e);
       final errorMessage = NetworkExceptions.getSupabaseExceptionMessage(e);
       emit(state.copyWith(
         isLoading: false,
@@ -330,7 +330,7 @@ class AuthCubit extends Cubit<app_auth.AuthState> {
       final email = forgotPasswordEmailController.text.trim();
       await authRemoteDataSource.sendPasswordResetEmail(email: email);
 
-      debugPrint('AuthCubit: Password reset email sent to $email');
+      log('Password reset email sent to $email', name: 'AuthCubit', level: 800);
       emit(state.copyWith(isLoading: false));
 
       if (context.mounted) {
@@ -339,7 +339,7 @@ class AuthCubit extends Cubit<app_auth.AuthState> {
         Navigator.pushNamed(context, RoutesName.resetLinkSent);
       }
     } catch (e) {
-      debugPrint('AuthCubit: Password reset error: $e');
+      log('Password reset email error: $e', name: 'AuthCubit', level: 900, error: e);
       final errorMessage = NetworkExceptions.getSupabaseExceptionMessage(e);
       emit(state.copyWith(
         isLoading: false,
@@ -427,7 +427,7 @@ class AuthCubit extends Cubit<app_auth.AuthState> {
       // Call data source to update password
       await authRemoteDataSource.updatePassword(newPassword: newPassword);
 
-      debugPrint('AuthCubit: Password reset successful');
+      log('Password reset successful', name: 'AuthCubit', level: 1000);
       emit(state.copyWith(isLoading: false));
 
       if (context.mounted) {
@@ -439,7 +439,7 @@ class AuthCubit extends Cubit<app_auth.AuthState> {
         );
       }
     } catch (e) {
-      debugPrint('AuthCubit: Password reset error: $e');
+      log('Password update error: $e', name: 'AuthCubit', level: 900, error: e);
       final errorMessage = NetworkExceptions.getSupabaseExceptionMessage(e);
       emit(state.copyWith(
         isLoading: false,
@@ -456,20 +456,20 @@ class AuthCubit extends Cubit<app_auth.AuthState> {
     required String accessToken,
     required String refreshToken,
   }) async {
-    debugPrint('AuthCubit: Handling password reset deep link');
+    log('Handling password reset deep link', name: 'AuthCubit', level: 800);
     
     try {
       emit(state.copyWith(isLoading: true));
       
       // Use recoverSession() instead of setSession() for password recovery
       // This is the recommended Supabase method for handling magic link/password reset tokens
-      debugPrint('AuthCubit: Recovering session with tokens');
+      log('Recovering session with tokens', name: 'AuthCubit', level: 800);
       final response = await SupabaseConfig.client.auth.recoverSession(
         'pkce_$accessToken', // Supabase expects 'pkce_' prefix format
       );
       
       if (response.user != null) {
-        debugPrint('AuthCubit: Session recovered successfully for user: ${response.user!.id}');
+        log('Session recovered successfully for user: ${response.user!.id}', name: 'AuthCubit', level: 1000);
         emit(state.copyWith(isLoading: false));
         
         // Navigate to reset password page
@@ -482,7 +482,7 @@ class AuthCubit extends Cubit<app_auth.AuthState> {
         throw Exception('Failed to recover session');
       }
     } catch (e) {
-      debugPrint('AuthCubit: Error recovering session from deep link: $e');
+      log('Error recovering session from deep link: $e', name: 'AuthCubit', level: 900, error: e);
       emit(state.copyWith(
         isLoading: false,
         errorMessage: 'Failed to verify reset link. Please request a new one.',
@@ -501,7 +501,7 @@ class AuthCubit extends Cubit<app_auth.AuthState> {
 
   /// Show error message for deep link failures
   void showError(String message) {
-    debugPrint('AuthCubit: Showing error: $message');
+    log('Showing error: $message', name: 'AuthCubit', level: 800);
     emit(state.copyWith(resetPasswordError: message));
   }
 

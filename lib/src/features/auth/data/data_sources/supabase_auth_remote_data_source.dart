@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+import 'dart:developer';
 import 'package:park_my_whip/src/core/models/supabase_user_model.dart';
 import 'package:park_my_whip/src/features/auth/data/data_sources/auth_remote_data_source.dart';
 import 'package:park_my_whip/supabase/supabase_config.dart';
@@ -18,7 +18,7 @@ class SupabaseAuthRemoteDataSource implements AuthRemoteDataSource {
     required String password,
   }) async {
     try {
-      debugPrint('SupabaseAuthRemoteDataSource: Attempting login for $email');
+      log('Attempting login for $email', name: 'SupabaseAuthRemoteDataSource', level: 800);
 
       // Sign in with Supabase
       final response = await _supabaseClient.auth.signInWithPassword(
@@ -31,7 +31,7 @@ class SupabaseAuthRemoteDataSource implements AuthRemoteDataSource {
         throw Exception('Login failed. No user returned.');
       }
 
-      debugPrint('SupabaseAuthRemoteDataSource: User logged in: ${user.id}');
+      log('User logged in: ${user.id}', name: 'SupabaseAuthRemoteDataSource', level: 1000);
 
       // Fetch user profile from users table
       final userProfile = await _supabaseClient
@@ -41,7 +41,7 @@ class SupabaseAuthRemoteDataSource implements AuthRemoteDataSource {
           .maybeSingle();
 
       if (userProfile == null) {
-        debugPrint('SupabaseAuthRemoteDataSource: Creating new user profile');
+        log('Creating new user profile', name: 'SupabaseAuthRemoteDataSource', level: 800);
         // Create user profile if it doesn't exist
         await _supabaseClient.from('users').insert({
           'id': user.id,
@@ -86,8 +86,7 @@ class SupabaseAuthRemoteDataSource implements AuthRemoteDataSource {
         updatedAt: DateTime.parse(userProfile['updated_at']),
       );
     } catch (e, stackTrace) {
-      debugPrint('SupabaseAuthRemoteDataSource: Login error: $e');
-      debugPrint('SupabaseAuthRemoteDataSource: Stack trace: $stackTrace');
+      log('Login error: $e', name: 'SupabaseAuthRemoteDataSource', level: 900, error: e, stackTrace: stackTrace);
       rethrow; // Let NetworkExceptions handle error translation
     }
   }
@@ -95,7 +94,7 @@ class SupabaseAuthRemoteDataSource implements AuthRemoteDataSource {
   @override
   Future<bool> sendPasswordResetEmail({required String email}) async {
     try {
-      debugPrint('SupabaseAuthRemoteDataSource: Sending password reset to $email');
+      log('Sending password reset to $email', name: 'SupabaseAuthRemoteDataSource', level: 800);
 
       // Use deep link URL for mobile app redirect
       const redirectUrl = 'parkmywhip://parkmywhip.com/reset-password';
@@ -105,10 +104,10 @@ class SupabaseAuthRemoteDataSource implements AuthRemoteDataSource {
         redirectTo: redirectUrl,
       );
 
-      debugPrint('SupabaseAuthRemoteDataSource: Password reset email sent with redirect: $redirectUrl');
+      log('Password reset email sent with redirect: $redirectUrl', name: 'SupabaseAuthRemoteDataSource', level: 800);
       return true;
     } catch (e) {
-      debugPrint('SupabaseAuthRemoteDataSource: Password reset error: $e');
+      log('Password reset error: $e', name: 'SupabaseAuthRemoteDataSource', level: 900, error: e);
       rethrow; // Let NetworkExceptions handle error translation
     }
   }
@@ -116,16 +115,16 @@ class SupabaseAuthRemoteDataSource implements AuthRemoteDataSource {
   @override
   Future<bool> updatePassword({required String newPassword}) async {
     try {
-      debugPrint('SupabaseAuthRemoteDataSource: Updating password');
+      log('Updating password', name: 'SupabaseAuthRemoteDataSource', level: 800);
 
       await _supabaseClient.auth.updateUser(
         UserAttributes(password: newPassword),
       );
 
-      debugPrint('SupabaseAuthRemoteDataSource: Password updated successfully');
+      log('Password updated successfully', name: 'SupabaseAuthRemoteDataSource', level: 1000);
       return true;
     } catch (e) {
-      debugPrint('SupabaseAuthRemoteDataSource: Update password error: $e');
+      log('Update password error: $e', name: 'SupabaseAuthRemoteDataSource', level: 900, error: e);
       rethrow; // Let NetworkExceptions handle error translation
     }
   }
@@ -133,12 +132,12 @@ class SupabaseAuthRemoteDataSource implements AuthRemoteDataSource {
   @override
   Future<bool> signOut() async {
     try {
-      debugPrint('SupabaseAuthRemoteDataSource: Signing out user');
+      log('Signing out user', name: 'SupabaseAuthRemoteDataSource', level: 800);
       await _supabaseClient.auth.signOut();
-      debugPrint('SupabaseAuthRemoteDataSource: User signed out successfully');
+      log('User signed out successfully', name: 'SupabaseAuthRemoteDataSource', level: 1000);
       return true;
     } catch (e) {
-      debugPrint('SupabaseAuthRemoteDataSource: Sign out error: $e');
+      log('Sign out error: $e', name: 'SupabaseAuthRemoteDataSource', level: 900, error: e);
       rethrow; // Let NetworkExceptions handle error translation
     }
   }
@@ -146,15 +145,15 @@ class SupabaseAuthRemoteDataSource implements AuthRemoteDataSource {
   @override
   Future<bool> sendSignUpOtp({required String email}) async {
     try {
-      debugPrint('SupabaseAuthRemoteDataSource: Sending OTP to $email');
+      log('Sending OTP to $email', name: 'SupabaseAuthRemoteDataSource', level: 800);
 
       // Send OTP to email using Supabase magic link/OTP
       await _supabaseClient.auth.signInWithOtp(email: email);
 
-      debugPrint('SupabaseAuthRemoteDataSource: OTP sent successfully to $email');
+      log('OTP sent successfully to $email', name: 'SupabaseAuthRemoteDataSource', level: 800);
       return true;
     } catch (e) {
-      debugPrint('SupabaseAuthRemoteDataSource: Send OTP error: $e');
+      log('Send OTP error: $e', name: 'SupabaseAuthRemoteDataSource', level: 900, error: e);
       rethrow; // Let NetworkExceptions handle error translation
     }
   }
@@ -167,7 +166,7 @@ class SupabaseAuthRemoteDataSource implements AuthRemoteDataSource {
     required String otp,
   }) async {
     try {
-      debugPrint('SupabaseAuthRemoteDataSource: Completing signup for $email');
+      log('Completing signup for $email', name: 'SupabaseAuthRemoteDataSource', level: 800);
 
       // First verify the OTP
       final verifyResponse = await _supabaseClient.auth.verifyOTP(
@@ -181,7 +180,7 @@ class SupabaseAuthRemoteDataSource implements AuthRemoteDataSource {
         throw Exception('OTP verification failed.');
       }
 
-      debugPrint('SupabaseAuthRemoteDataSource: OTP verified. Updating password...');
+      log('OTP verified. Updating password...', name: 'SupabaseAuthRemoteDataSource', level: 800);
 
       // Update user password after OTP verification
       await _supabaseClient.auth.updateUser(
@@ -191,7 +190,7 @@ class SupabaseAuthRemoteDataSource implements AuthRemoteDataSource {
         ),
       );
 
-      debugPrint('SupabaseAuthRemoteDataSource: Password updated successfully');
+      log('Password updated successfully', name: 'SupabaseAuthRemoteDataSource', level: 1000);
 
       // Check if user profile exists in users table
       final userProfile = await _supabaseClient
@@ -201,7 +200,7 @@ class SupabaseAuthRemoteDataSource implements AuthRemoteDataSource {
           .maybeSingle();
 
       if (userProfile == null) {
-        debugPrint('SupabaseAuthRemoteDataSource: Creating user profile in database');
+        log('Creating user profile in database', name: 'SupabaseAuthRemoteDataSource', level: 800);
         // Create user profile
         await _supabaseClient.from('users').insert({
           'id': user.id,
@@ -246,7 +245,7 @@ class SupabaseAuthRemoteDataSource implements AuthRemoteDataSource {
         updatedAt: DateTime.parse(userProfile['updated_at']),
       );
     } catch (e) {
-      debugPrint('SupabaseAuthRemoteDataSource: Complete signup error: $e');
+      log('Complete signup error: $e', name: 'SupabaseAuthRemoteDataSource', level: 900, error: e);
       rethrow; // Let NetworkExceptions handle error translation
     }
   }

@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:flutter/foundation.dart';
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:park_my_whip/src/core/routes/router.dart';
 import 'package:park_my_whip/src/core/widgets/error_dialog.dart';
@@ -10,7 +10,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 abstract class NetworkExceptions {
   /// Takes a Supabase exception and returns a user-friendly error message
   static String getSupabaseExceptionMessage(dynamic error) {
-    debugPrint('NetworkExceptions: Processing error: $error');
+    log('Processing error: $error', name: 'NetworkExceptions', level: 900, error: error);
 
     // Network connectivity issues
     if (error is SocketException) {
@@ -50,7 +50,7 @@ abstract class NetworkExceptions {
     final message = error.message.toLowerCase();
     final statusCode = error.statusCode;
 
-    debugPrint('NetworkExceptions: Auth error - Code: $statusCode, Message: ${error.message}');
+    log('Auth error - Code: $statusCode, Message: ${error.message}', name: 'NetworkExceptions', level: 900);
 
     // Common auth error patterns
     if (message.contains('invalid login credentials') ||
@@ -146,7 +146,7 @@ abstract class NetworkExceptions {
     final message = error.message?.toLowerCase() ?? '';
     final code = error.code;
 
-    debugPrint('NetworkExceptions: Database error - Code: $code, Message: ${error.message}');
+    log('Database error - Code: $code, Message: ${error.message}', name: 'NetworkExceptions', level: 900);
 
     if (code == '23505') {
       return 'This record already exists in the database.';
@@ -184,7 +184,7 @@ abstract class NetworkExceptions {
     final message = error.message?.toLowerCase() ?? '';
     final statusCode = error.statusCode;
 
-    debugPrint('NetworkExceptions: Storage error - Code: $statusCode, Message: ${error.message}');
+    log('Storage error - Code: $statusCode, Message: ${error.message}', name: 'NetworkExceptions', level: 900);
 
     if (statusCode == '404' || message.contains('not found')) {
       return 'File not found in storage.';
@@ -227,7 +227,7 @@ abstract class NetworkExceptions {
   }) {
     final context = AppRouter.navigatorKey.currentContext;
     if (context == null) {
-      debugPrint('NetworkExceptions: Cannot show dialog - no context available');
+      log('Cannot show dialog - no context available', name: 'NetworkExceptions', level: 900);
       return;
     }
 

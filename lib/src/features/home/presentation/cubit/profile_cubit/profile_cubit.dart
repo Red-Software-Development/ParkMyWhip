@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+import 'dart:developer';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:park_my_whip/src/core/config/injection.dart';
 import 'package:park_my_whip/src/features/home/presentation/cubit/dashboard_cubit/dashboard_cubit.dart';
@@ -8,22 +8,22 @@ class ProfileCubit extends Cubit<ProfileState> {
   ProfileCubit() : super(const ProfileState());
 
   void changeEmail() {
-    debugPrint('Change email tapped');
+    log('Change email tapped', name: 'ProfileCubit', level: 800);
     // TODO: Implement change email functionality
   }
 
   void changePassword() {
-    debugPrint('Change password tapped');
+    log('Change password tapped', name: 'ProfileCubit', level: 800);
     // TODO: Implement change password functionality
   }
 
   void logOut() {
-    debugPrint('Log out tapped');
+    log('Log out tapped', name: 'ProfileCubit', level: 800);
     // TODO: Implement logout functionality
   }
 
   void deleteAccount() {
-    debugPrint('Delete account tapped');
+    log('Delete account tapped', name: 'ProfileCubit', level: 800);
     // TODO: Implement delete account functionality
   }
 

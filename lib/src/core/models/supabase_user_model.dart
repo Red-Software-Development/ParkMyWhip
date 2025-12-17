@@ -1,6 +1,5 @@
 import 'dart:convert';
-
-import 'package:flutter/foundation.dart';
+import 'dart:developer';
 
 class SupabaseUserModel {
   final String id;
@@ -84,7 +83,7 @@ class SupabaseUserModel {
     if (value is String && value.isNotEmpty) {
       return DateTime.tryParse(value) ?? DateTime.now();
     }
-    debugPrint('SupabaseUserModel: Invalid date "$value", defaulting to now.');
+    log('Invalid date "$value", defaulting to now.', name: 'SupabaseUserModel', level: 900);
     return DateTime.now();
   }
 

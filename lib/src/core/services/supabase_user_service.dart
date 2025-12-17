@@ -1,6 +1,5 @@
 import 'dart:convert';
-
-import 'package:flutter/foundation.dart';
+import 'dart:developer';
 import 'package:park_my_whip/src/core/constants/strings.dart';
 import 'package:park_my_whip/src/core/helpers/shared_pref_helper.dart';
 import 'package:park_my_whip/src/core/models/supabase_user_model.dart';
@@ -22,8 +21,7 @@ class SupabaseUserService {
           jsonDecode(stored) as Map<String, dynamic>;
       return SupabaseUserModel.fromJson(decoded);
     } catch (error, stackTrace) {
-      debugPrint('SupabaseUserService.getCachedUser error: $error');
-      debugPrint(stackTrace.toString());
+      log('getCachedUser error: $error', name: 'SupabaseUserService', level: 900, error: error, stackTrace: stackTrace);
       return null;
     }
   }
@@ -35,8 +33,7 @@ class SupabaseUserService {
         value: jsonEncode(user.toJson()),
       );
     } catch (error, stackTrace) {
-      debugPrint('SupabaseUserService.cacheUser error: $error');
-      debugPrint(stackTrace.toString());
+      log('cacheUser error: $error', name: 'SupabaseUserService', level: 900, error: error, stackTrace: stackTrace);
     }
   }
 
@@ -44,8 +41,7 @@ class SupabaseUserService {
     try {
       await _sharedPrefHelper.removeData(SharedPrefStrings.supabaseUserProfile);
     } catch (error, stackTrace) {
-      debugPrint('SupabaseUserService.clearUser error: $error');
-      debugPrint(stackTrace.toString());
+      log('clearUser error: $error', name: 'SupabaseUserService', level: 900, error: error, stackTrace: stackTrace);
     }
   }
 

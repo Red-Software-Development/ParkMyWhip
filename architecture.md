@@ -275,6 +275,51 @@ lib/
 
 4. **Split large widget trees** into smaller widget classes (not functions)
 
+### **Logging Conventions**
+
+**Always use `dart:developer`'s `log()` function** instead of `print()` or `debugPrint()`:
+
+```dart
+import 'dart:developer';
+
+// ✅ CORRECT - Structured logging with context
+log('User logged in successfully: ${user.id}', name: 'AuthCubit', level: 1000);
+log('Loading reports', name: 'ReportsCubit', level: 800);
+log('Error fetching data: $e', name: 'DataService', level: 900, error: e, stackTrace: stackTrace);
+
+// ❌ WRONG - Unstructured logging
+debugPrint('AuthCubit: User logged in');
+print('Error: $e');
+```
+
+**Log Level Guidelines**:
+- **Level 800**: Info/Debug logs (normal operations, navigation, data loading)
+- **Level 900**: Warning/Error logs (errors, exceptions, validation failures)
+- **Level 1000**: Success logs (important user actions completed successfully)
+
+**Name Parameter**: Always use the class name as the `name` parameter for better log filtering:
+```dart
+// In AuthCubit
+log('Handling password reset', name: 'AuthCubit', level: 800);
+
+// In DeepLinkService
+log('Deep link received: $uri', name: 'DeepLinkService', level: 800);
+```
+
+**Error Logging**: Include `error` and `stackTrace` parameters when logging exceptions:
+```dart
+catch (e, stackTrace) {
+  log('Login error: $e', name: 'AuthCubit', level: 900, error: e, stackTrace: stackTrace);
+}
+```
+
+**Benefits of `log()` over `debugPrint()`**:
+- Structured logging with named parameters
+- Better filtering by component name in DevTools
+- Severity levels for prioritizing logs
+- Stack traces automatically linked to errors
+- Better performance (no string interpolation unless debugging)
+
 ---
 
 ## State Management Pattern
@@ -707,6 +752,14 @@ class ReportsCubit extends Cubit<ReportsState> {
 - ✅ Added proper error handling and loading states for login flow
 - ✅ Auto-creates user profile in users table if not exists after authentication
 
+### 2025-03-06
+- ✅ Migrated all logging from `print()`/`debugPrint()` to `dart:developer`'s `log()` function across the entire codebase
+- ✅ Implemented structured logging with `name` (class name) and `level` (800/900/1000) parameters for better filtering
+- ✅ Added proper error logging with `error` and `stackTrace` parameters for exceptions
+- ✅ Updated 8 files with consistent logging pattern: DeepLinkService, AuthCubit, SupabaseAuthRemoteDataSource, SupabaseUserService, ProfileCubit, TowCubit, SupabaseUserModel, NetworkExceptions
+- ✅ Documented logging conventions in architecture.md with level guidelines and examples
+- ✅ Added logging standards to Key Principles Summary for future reference
+
 ---
 
 ## Key Principles Summary
@@ -720,6 +773,9 @@ class ReportsCubit extends Cubit<ReportsState> {
 - Keep state immutable
 - Extract reusable components
 - Document public widgets with ///
+- Use `log()` from `dart:developer` for all logging
+- Include `name` and `level` parameters in logs
+- Add `error` and `stackTrace` to exception logs
 
 ❌ **DON'T**:
 - Create widget functions (use classes)
@@ -729,6 +785,7 @@ class ReportsCubit extends Cubit<ReportsState> {
 - Mutate state directly
 - Duplicate UI code
 - Create private widgets that could be reusable
+- Use `print()` or `debugPrint()` for logging
 
 ---
 
