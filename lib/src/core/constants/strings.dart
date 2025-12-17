@@ -46,6 +46,12 @@ class AuthStrings {
   static const String passwordUppercase = 'Include at least one uppercase letter (A-Z)';
   static const String passwordLowercase = 'Include at least one lowercase (a-z)';
   static const String passwordNumber = 'Include at least one number (0-9)';
+  
+  // Reset Link Error
+  static const String linkExpired = 'Link Expired';
+  static const String linkExpiredMessage = 'This password reset link is invalid or has expired.';
+  static const String linkExpiredInstruction = 'Please request a new password reset link from the login page.';
+  static const String goToLoginButton = 'Go to Login';
 }
 
 class FirebaseStrings {

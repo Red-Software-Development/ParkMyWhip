@@ -1,8 +1,11 @@
 import 'dart:async';
 import 'dart:developer';
 import 'package:app_links/app_links.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:park_my_whip/src/core/config/injection.dart';
+import 'package:park_my_whip/src/core/constants/strings.dart';
+import 'package:park_my_whip/src/core/routes/names.dart';
 import 'package:park_my_whip/src/core/routes/router.dart';
 import 'package:park_my_whip/src/features/auth/presentation/cubit/auth_cubit.dart';
 
@@ -65,6 +68,25 @@ class DeepLinkService {
     final isPasswordResetPath = uri.path.contains('reset-password');
     final codeParam = uri.queryParameters['code'];
     final typeParam = uri.queryParameters['type'];
+    
+    // Check for errors in query params first
+    final errorParam = uri.queryParameters['error'];
+    final errorDescription = uri.queryParameters['error_description'];
+    
+    if (isPasswordResetPath && errorParam != null) {
+      // Link has error (expired or invalid)
+      log('Error in query params: $errorParam - $errorDescription', name: 'DeepLinkService', level: 900);
+      final context = AppRouter.navigatorKey.currentContext;
+      if (context != null) {
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          RoutesName.resetLinkError,
+          (route) => false,
+          arguments: errorDescription?.replaceAll('+', ' ') ?? AuthStrings.linkExpiredMessage,
+        );
+      }
+      return;
+    }
 
     if (isPasswordResetPath && codeParam != null) {
       // Supabase PKCE flow: Exchange code for session tokens
@@ -113,12 +135,17 @@ class DeepLinkService {
 
         // Check for errors in fragment
         final error = fragmentParams['error'];
-        final errorDescription = fragmentParams['error_description'];
+        final fragmentErrorDescription = fragmentParams['error_description'];
         if (error != null) {
-          log('Error in hash fragment: $error - $errorDescription', name: 'DeepLinkService', level: 900);
+          log('Error in hash fragment: $error - $fragmentErrorDescription', name: 'DeepLinkService', level: 900);
           final context = AppRouter.navigatorKey.currentContext;
           if (context != null) {
-            getIt<AuthCubit>().showError('Password reset failed: ${errorDescription ?? error}');
+            Navigator.pushNamedAndRemoveUntil(
+              context,
+              RoutesName.resetLinkError,
+              (route) => false,
+              arguments: fragmentErrorDescription?.replaceAll('+', ' ') ?? 'Password reset link is invalid or has expired',
+            );
           }
           return;
         }
@@ -128,7 +155,12 @@ class DeepLinkService {
       log('No recovery code or tokens found in deep link', name: 'DeepLinkService', level: 900);
       final context = AppRouter.navigatorKey.currentContext;
       if (context != null) {
-        getIt<AuthCubit>().showError('Password reset link is invalid or has expired. Please request a new one.');
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          RoutesName.resetLinkError,
+          (route) => false,
+          arguments: 'Password reset link is invalid or has expired',
+        );
       }
     } else {
       log('Unhandled deep link path: ${uri.path}', name: 'DeepLinkService', level: 800);

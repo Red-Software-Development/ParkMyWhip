@@ -4,6 +4,7 @@ import 'package:park_my_whip/src/core/config/injection.dart';
 import 'package:park_my_whip/src/features/auth/presentation/cubit/auth_cubit.dart';
 import 'package:park_my_whip/src/features/auth/presentation/pages/forgot_password_page.dart';
 import 'package:park_my_whip/src/features/auth/presentation/pages/login_page.dart';
+import 'package:park_my_whip/src/features/auth/presentation/pages/reset_link_error_page.dart';
 import 'package:park_my_whip/src/features/auth/presentation/pages/reset_link_sent_page.dart';
 import 'package:park_my_whip/src/features/auth/presentation/pages/reset_password_page.dart';
 import 'package:park_my_whip/src/features/auth/presentation/pages/sign_up_pages/create_password_page.dart';
@@ -74,6 +75,11 @@ class AppRouter {
             value: getIt<AuthCubit>(),
             child: const ResetPasswordPage(),
           ),
+        );
+      case RoutesName.resetLinkError:
+        final errorMessage = settings.arguments as String?;
+        return MaterialPageRoute(
+          builder: (_) => ResetLinkErrorPage(errorMessage: errorMessage),
         );
 
       default:

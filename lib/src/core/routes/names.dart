@@ -8,4 +8,5 @@ class RoutesName {
   static const forgotPassword = '/forgot-password';
   static const resetLinkSent = '/reset-link-sent';
   static const resetPassword = '/reset-password';
+  static const resetLinkError = '/reset-link-error';
 }
