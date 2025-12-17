@@ -459,19 +459,20 @@ class AuthCubit extends Cubit<app_auth.AuthState> {
     debugPrint('AuthCubit: Handling password reset deep link - token: ${accessToken.isNotEmpty ? 'present' : 'missing'}, type: $type');
     
     try {
-      // Verify the OTP token from the email link to get a valid session
+      // Verify the recovery token from the email link to get a valid session
+      // The token from Supabase email is a tokenHash (short numeric code)
       final response = await SupabaseConfig.client.auth.verifyOTP(
-        token: accessToken,
+        tokenHash: accessToken,
         type: OtpType.recovery,
       );
       
-      debugPrint('AuthCubit: OTP verified successfully - session: ${response.session != null ? 'present' : 'missing'}');
+      debugPrint('AuthCubit: Token verified successfully - session: ${response.session != null ? 'present' : 'missing'}');
       
       if (response.session != null) {
-        // Store token in state for later use
-        emit(state.copyWith(passwordResetToken: accessToken));
+        // Session established, navigate to reset password page
+        // No need to store token - user is already authenticated
+        emit(state.copyWith(isLoading: false));
         
-        // Navigate to reset password page
         Navigator.pushNamedAndRemoveUntil(
           context,
           RoutesName.resetPassword,
@@ -481,7 +482,7 @@ class AuthCubit extends Cubit<app_auth.AuthState> {
         debugPrint('AuthCubit: No session returned from verifyOTP');
       }
     } catch (e) {
-      debugPrint('AuthCubit: Error verifying OTP from deep link: $e');
+      debugPrint('AuthCubit: Error verifying token from deep link: $e');
     }
   }
 
