@@ -9,7 +9,9 @@ void main() async {
 
   await SupabaseConfig.initialize();
   setupDependencyInjection();
-  await DeepLinkService.initialize();
+  
+  // Initialize Supabase auth state listener for password reset deep links
+  DeepLinkService.initialize();
 
   runApp(const ParkMyWhipApp());
 }
