@@ -8,6 +8,7 @@ import 'package:park_my_whip/src/core/services/supabase_user_service.dart';
 import 'package:park_my_whip/src/features/auth/data/data_sources/auth_remote_data_source.dart';
 import 'package:park_my_whip/src/features/auth/domain/validators.dart';
 import 'package:park_my_whip/supabase/supabase_config.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'auth_state.dart' as app_auth;
 
 class AuthCubit extends Cubit<app_auth.AuthState> {
@@ -455,25 +456,32 @@ class AuthCubit extends Cubit<app_auth.AuthState> {
     required String refreshToken,
     required String type,
   }) async {
-    debugPrint('AuthCubit: Handling password reset deep link - accessToken: ${accessToken.isNotEmpty ? 'present' : 'missing'}, type: $type');
+    debugPrint('AuthCubit: Handling password reset deep link - token: ${accessToken.isNotEmpty ? 'present' : 'missing'}, type: $type');
     
     try {
-      // Set the Supabase session with the tokens from the deep link
-      await SupabaseConfig.client.auth.setSession(accessToken);
-      
-      debugPrint('AuthCubit: Session set successfully');
-      
-      // Store token in state for later use
-      emit(state.copyWith(passwordResetToken: accessToken));
-      
-      // Navigate to reset password page
-      Navigator.pushNamedAndRemoveUntil(
-        context,
-        RoutesName.resetPassword,
-        (route) => false,
+      // Verify the OTP token from the email link to get a valid session
+      final response = await SupabaseConfig.client.auth.verifyOTP(
+        token: accessToken,
+        type: OtpType.recovery,
       );
+      
+      debugPrint('AuthCubit: OTP verified successfully - session: ${response.session != null ? 'present' : 'missing'}');
+      
+      if (response.session != null) {
+        // Store token in state for later use
+        emit(state.copyWith(passwordResetToken: accessToken));
+        
+        // Navigate to reset password page
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          RoutesName.resetPassword,
+          (route) => false,
+        );
+      } else {
+        debugPrint('AuthCubit: No session returned from verifyOTP');
+      }
     } catch (e) {
-      debugPrint('AuthCubit: Error setting session from deep link: $e');
+      debugPrint('AuthCubit: Error verifying OTP from deep link: $e');
     }
   }
 

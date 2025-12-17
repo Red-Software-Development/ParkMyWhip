@@ -44,18 +44,19 @@ class DeepLinkService {
     debugPrint('DeepLinkService: Deep link received: $uri');
 
     if (uri.path.contains('resetPassword')) {
-      final accessToken = uri.queryParameters['access_token'];
+      // Support both 'token' (from email template) and 'access_token' (legacy)
+      final token = uri.queryParameters['token'] ?? uri.queryParameters['access_token'];
       final refreshToken = uri.queryParameters['refresh_token'];
       final type = uri.queryParameters['type'] ?? 'recovery';
 
-      debugPrint('DeepLinkService: Password reset link - accessToken: ${accessToken != null ? 'present' : 'missing'}, type: $type');
+      debugPrint('DeepLinkService: Password reset link - token: ${token != null ? 'present' : 'missing'}, type: $type');
 
-      if (accessToken != null) {
+      if (token != null) {
         final context = AppRouter.navigatorKey.currentContext;
         if (context != null) {
           getIt<AuthCubit>().handlePasswordResetDeepLink(
             context: context,
-            accessToken: accessToken,
+            accessToken: token,
             refreshToken: refreshToken ?? '',
             type: type,
           );
