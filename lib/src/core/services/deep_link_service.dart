@@ -61,27 +61,32 @@ class DeepLinkService {
     debugPrint('DeepLinkService: Deep link received: $uri');
 
     if (uri.path.contains('reset-password')) {
-      // Support both token types:
-      // 'access_token' - from Supabase auth URL (full JWT)
-      // 'token' - from email template (token hash)
-      final accessToken = uri.queryParameters['access_token'];
-      final tokenHash = uri.queryParameters['token'];
-      final refreshToken = uri.queryParameters['refresh_token'];
-      final type = uri.queryParameters['type'] ?? 'recovery';
+      // Supabase sends tokens in the fragment (hash), not query params
+      // Fragment format: #access_token=xxx&refresh_token=xxx&type=recovery
+      final fragment = uri.fragment;
+      debugPrint('DeepLinkService: Fragment: $fragment');
 
-      debugPrint('DeepLinkService: Password reset link - access_token: ${accessToken != null ? 'present' : 'missing'}, token: ${tokenHash != null ? 'present' : 'missing'}, type: $type');
+      // Parse fragment as query parameters
+      final fragmentParams = Uri.splitQueryString(fragment);
+      
+      final accessToken = fragmentParams['access_token'];
+      final refreshToken = fragmentParams['refresh_token'];
+      final type = fragmentParams['type'] ?? 'recovery';
 
-      if (accessToken != null || tokenHash != null) {
+      debugPrint('DeepLinkService: Password reset link - access_token: ${accessToken != null ? 'present' : 'missing'}, type: $type');
+
+      if (accessToken != null) {
         final context = AppRouter.navigatorKey.currentContext;
         if (context != null) {
           getIt<AuthCubit>().handlePasswordResetDeepLink(
             context: context,
             accessToken: accessToken,
-            tokenHash: tokenHash,
             refreshToken: refreshToken ?? '',
             type: type,
           );
         }
+      } else {
+        debugPrint('DeepLinkService: No access token found in fragment');
       }
     }
   }
