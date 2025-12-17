@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:app_links/app_links.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:park_my_whip/src/core/config/injection.dart';
 import 'package:park_my_whip/src/core/routes/router.dart';
 import 'package:park_my_whip/src/features/auth/presentation/cubit/auth_cubit.dart';
@@ -10,22 +11,38 @@ import 'package:park_my_whip/src/features/auth/presentation/cubit/auth_cubit.dar
 class DeepLinkService {
   static final AppLinks _appLinks = AppLinks();
   static StreamSubscription<Uri>? _linkSubscription;
+  static Uri? _pendingDeepLink;
 
   /// Initialize deep link listener for mobile platforms only
   static Future<void> initialize() async {
-    await _handleInitialLink();
+    await _captureInitialLink();
     _handleIncomingLinks();
   }
 
-  /// Handle deep link when app is opened from a link (cold start)
-  static Future<void> _handleInitialLink() async {
+  /// Capture initial link but don't process yet (context not ready)
+  static Future<void> _captureInitialLink() async {
     try {
       final Uri? uri = await _appLinks.getInitialLink();
       if (uri != null) {
-        _processDeepLink(uri);
+        debugPrint('DeepLinkService: Captured initial link: $uri');
+        _pendingDeepLink = uri;
       }
     } catch (e) {
       debugPrint('DeepLinkService: Error getting initial link: $e');
+    }
+  }
+
+  /// Process pending deep link after app is built (call from first screen)
+  static void processPendingDeepLink() {
+    if (_pendingDeepLink != null) {
+      debugPrint('DeepLinkService: Processing pending deep link: $_pendingDeepLink');
+      // Defer to next frame to ensure navigation is ready
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        if (_pendingDeepLink != null) {
+          _processDeepLink(_pendingDeepLink!);
+          _pendingDeepLink = null;
+        }
+      });
     }
   }
 
