@@ -71,11 +71,6 @@ class Validators {
       return 'Password must contain at least one number';
     }
 
-    // Symbol check
-    if (!value.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>_\-+=~`;/\[\]\\]'))) {
-      return 'Password must contain at least one special character';
-    }
-
     return null;
   }
 

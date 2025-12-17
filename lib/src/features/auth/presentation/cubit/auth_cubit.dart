@@ -386,8 +386,16 @@ class AuthCubit extends Cubit<app_auth.AuthState> {
     final hasPassword = resetPasswordController.text.trim().isNotEmpty;
     final hasConfirmPassword = resetConfirmPasswordController.text.trim().isNotEmpty;
     final shouldEnable = hasPassword && hasConfirmPassword;
-    if (state.isResetPasswordButtonEnabled != shouldEnable) {
-      emit(state.copyWith(isResetPasswordButtonEnabled: shouldEnable));
+    
+    // Clear errors when user starts typing again
+    if (state.isResetPasswordButtonEnabled != shouldEnable || 
+        state.resetPasswordError != null || 
+        state.resetConfirmPasswordError != null) {
+      emit(state.copyWith(
+        isResetPasswordButtonEnabled: shouldEnable,
+        resetPasswordError: null,
+        resetConfirmPasswordError: null,
+      ));
     }
   }
 
