@@ -499,6 +499,12 @@ class AuthCubit extends Cubit<app_auth.AuthState> {
     }
   }
 
+  /// Show error message for deep link failures
+  void showError(String message) {
+    debugPrint('AuthCubit: Showing error: $message');
+    emit(state.copyWith(resetPasswordError: message));
+  }
+
   @override
   Future<void> close() {
     _resendTimer?.cancel();
