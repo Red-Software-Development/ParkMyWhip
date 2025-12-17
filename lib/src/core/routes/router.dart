@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:park_my_whip/src/core/config/injection.dart';
 import 'package:park_my_whip/src/features/auth/presentation/cubit/auth_cubit.dart';
@@ -83,6 +84,13 @@ class AppRouter {
         );
 
       default:
+        final routeName = settings.name ?? '';
+        if (routeName.contains('reset-password')) {
+          return MaterialPageRoute(
+            settings: settings,
+            builder: (_) => const DeepLinkPlaceholderPage(),
+          );
+        }
         return MaterialPageRoute(
           builder: (_) => Scaffold(
             body: Center(child: Text('No route defined for ${settings.name}')),
@@ -90,4 +98,27 @@ class AppRouter {
         );
     }
   }
+}
+
+class DeepLinkPlaceholderPage extends StatefulWidget {
+  const DeepLinkPlaceholderPage({super.key});
+
+  @override
+  State<DeepLinkPlaceholderPage> createState() => _DeepLinkPlaceholderPageState();
+}
+
+class _DeepLinkPlaceholderPageState extends State<DeepLinkPlaceholderPage> {
+  @override
+  void initState() {
+    super.initState();
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      final navigator = Navigator.of(context);
+      if (navigator.canPop()) {
+        navigator.pop();
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) => const SizedBox.shrink();
 }

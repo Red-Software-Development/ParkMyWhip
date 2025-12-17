@@ -760,6 +760,10 @@ class ReportsCubit extends Cubit<ReportsState> {
 - ✅ Documented logging conventions in architecture.md with level guidelines and examples
 - ✅ Added logging standards to Key Principles Summary for future reference
 
+### 2025-03-07
+- ✅ Added `DeepLinkPlaceholderPage` and router guard that automatically pops unknown `/reset-password` routes so deep link handoffs never leave the white "No route defined" screen on warm starts.
+- ✅ Reused `AuthStrings.linkExpiredMessage` inside `DeepLinkService` to remove lingering hardcoded strings from the password reset flow.
+
 ---
 
 ## Key Principles Summary

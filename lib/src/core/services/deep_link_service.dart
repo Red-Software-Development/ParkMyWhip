@@ -144,7 +144,7 @@ class DeepLinkService {
               context,
               RoutesName.resetLinkError,
               (route) => false,
-              arguments: fragmentErrorDescription?.replaceAll('+', ' ') ?? 'Password reset link is invalid or has expired',
+              arguments: fragmentErrorDescription?.replaceAll('+', ' ') ?? AuthStrings.linkExpiredMessage,
             );
           }
           return;
@@ -159,7 +159,7 @@ class DeepLinkService {
           context,
           RoutesName.resetLinkError,
           (route) => false,
-          arguments: 'Password reset link is invalid or has expired',
+          arguments: AuthStrings.linkExpiredMessage,
         );
       }
     } else {
