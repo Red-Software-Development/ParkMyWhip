@@ -450,29 +450,52 @@ class AuthCubit extends Cubit<app_auth.AuthState> {
 
   //************************************ deep link handling ************************** */
   /// Handle password reset deep link from mobile (iOS/Android)
-  /// Sets the session using access_token from Supabase email link
+  /// Uses recoverSession() to establish a valid session for password reset
   Future<void> handlePasswordResetDeepLink({
     required BuildContext context,
     required String accessToken,
     required String refreshToken,
-    required String type,
   }) async {
-    debugPrint('AuthCubit: Handling password reset deep link - type: $type');
+    debugPrint('AuthCubit: Handling password reset deep link');
     
     try {
-      debugPrint('AuthCubit: Setting session with access token');
-      await SupabaseConfig.client.auth.setSession(accessToken);
+      emit(state.copyWith(isLoading: true));
       
-      debugPrint('AuthCubit: Session set successfully');
-      emit(state.copyWith(isLoading: false));
-      
-      Navigator.pushNamedAndRemoveUntil(
-        context,
-        RoutesName.resetPassword,
-        (route) => false,
+      // Use recoverSession() instead of setSession() for password recovery
+      // This is the recommended Supabase method for handling magic link/password reset tokens
+      debugPrint('AuthCubit: Recovering session with tokens');
+      final response = await SupabaseConfig.client.auth.recoverSession(
+        'pkce_$accessToken', // Supabase expects 'pkce_' prefix format
       );
+      
+      if (response.user != null) {
+        debugPrint('AuthCubit: Session recovered successfully for user: ${response.user!.id}');
+        emit(state.copyWith(isLoading: false));
+        
+        // Navigate to reset password page
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          RoutesName.resetPassword,
+          (route) => false,
+        );
+      } else {
+        throw Exception('Failed to recover session');
+      }
     } catch (e) {
-      debugPrint('AuthCubit: Error setting session from deep link: $e');
+      debugPrint('AuthCubit: Error recovering session from deep link: $e');
+      emit(state.copyWith(
+        isLoading: false,
+        errorMessage: 'Failed to verify reset link. Please request a new one.',
+      ));
+      
+      // Navigate back to login on error
+      if (context.mounted) {
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          RoutesName.login,
+          (route) => false,
+        );
+      }
     }
   }
 

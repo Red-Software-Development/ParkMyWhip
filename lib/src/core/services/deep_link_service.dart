@@ -59,47 +59,45 @@ class DeepLinkService {
   /// Process deep link URI and navigate to appropriate page
   static void _processDeepLink(Uri uri) {
     debugPrint('DeepLinkService: Deep link received: $uri');
+    debugPrint('DeepLinkService: Full URI string: ${uri.toString()}');
 
-    // Try to get tokens from query params first (from our edge function)
-    String? accessToken = uri.queryParameters['access_token'];
-    String? refreshToken = uri.queryParameters['refresh_token'];
-    String? type = uri.queryParameters['type'];
-
-    // Fallback: Check hash fragment (direct Supabase redirect)
-    if (accessToken == null) {
-      final fragment = uri.fragment;
-      debugPrint('DeepLinkService: Checking fragment: $fragment');
-      
-      if (fragment.isNotEmpty) {
-        final fragmentParams = Uri.splitQueryString(fragment);
-        accessToken = fragmentParams['access_token'];
-        refreshToken = fragmentParams['refresh_token'];
-        type = fragmentParams['type'];
-      }
+    // Supabase sends recovery tokens in hash fragment for mobile apps
+    final fragment = uri.fragment;
+    debugPrint('DeepLinkService: Hash fragment: $fragment');
+    
+    if (fragment.isEmpty) {
+      debugPrint('DeepLinkService: No hash fragment found');
+      return;
     }
 
-    debugPrint('DeepLinkService: access_token: ${accessToken != null ? 'present' : 'missing'}, type: $type');
+    // Parse hash fragment parameters
+    final fragmentParams = Uri.splitQueryString(fragment);
+    final accessToken = fragmentParams['access_token'];
+    final refreshToken = fragmentParams['refresh_token'];
+    final type = fragmentParams['type'];
+
+    debugPrint('DeepLinkService: Parsed params - access_token: ${accessToken != null ? 'present' : 'missing'}, refresh_token: ${refreshToken != null ? 'present' : 'missing'}, type: $type');
 
     // Handle password reset (type=recovery)
-    if (type == 'recovery') {
-      if (accessToken != null) {
-        final context = AppRouter.navigatorKey.currentContext;
-        if (context != null) {
-          getIt<AuthCubit>().handlePasswordResetDeepLink(
-            context: context,
-            accessToken: accessToken,
-            refreshToken: refreshToken ?? '',
-            type: type,
-          );
-        }
+    if (type == 'recovery' && accessToken != null && refreshToken != null) {
+      final context = AppRouter.navigatorKey.currentContext;
+      if (context != null) {
+        getIt<AuthCubit>().handlePasswordResetDeepLink(
+          context: context,
+          accessToken: accessToken,
+          refreshToken: refreshToken,
+        );
       } else {
-        debugPrint('DeepLinkService: No access token found');
-        // Check for errors
-        final error = uri.queryParameters['error'] ?? 
-                     Uri.splitQueryString(uri.fragment)['error'];
-        if (error != null) {
-          debugPrint('DeepLinkService: Error in deep link: $error');
-        }
+        debugPrint('DeepLinkService: No navigator context available');
+      }
+    } else {
+      debugPrint('DeepLinkService: Invalid recovery link - missing required parameters');
+      
+      // Check for errors in fragment
+      final error = fragmentParams['error'];
+      final errorDescription = fragmentParams['error_description'];
+      if (error != null) {
+        debugPrint('DeepLinkService: Error in deep link: $error - $errorDescription');
       }
     }
   }

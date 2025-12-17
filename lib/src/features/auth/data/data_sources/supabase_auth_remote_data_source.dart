@@ -97,8 +97,8 @@ class SupabaseAuthRemoteDataSource implements AuthRemoteDataSource {
     try {
       debugPrint('SupabaseAuthRemoteDataSource: Sending password reset to $email');
 
-      // Get Supabase project URL for edge function redirect
-      final redirectUrl = '${SupabaseConfig.supabaseUrl}/functions/v1/password-reset-redirect';
+      // Use deep link URL for mobile app redirect
+      const redirectUrl = 'parkmywhip://parkmywhip.com/reset-password';
 
       await _supabaseClient.auth.resetPasswordForEmail(
         email,
