@@ -40,7 +40,7 @@ class AppRouter {
             child: const CreatePasswordPage(),
           ),
         );
-      case RoutesName.initial:
+     case RoutesName.initial:
       case RoutesName.login:
         return MaterialPageRoute(
           builder: (_) => BlocProvider.value(
@@ -77,9 +77,8 @@ class AppRouter {
           ),
         );
       case RoutesName.resetLinkError:
-        final errorMessage = settings.arguments as String?;
         return MaterialPageRoute(
-          builder: (_) => ResetLinkErrorPage(errorMessage: errorMessage),
+          builder: (_) => const ResetLinkErrorPage(),
         );
 
       default:

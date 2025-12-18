@@ -64,12 +64,12 @@ class DeepLinkService {
   static void _handlePasswordResetError(String error) {
     final context = AppRouter.navigatorKey.currentContext;
     if (context != null) {
-      log('Navigating to error page: $error', name: 'DeepLinkService', level: 900);
+      log('Password reset link error: $error. Showing error page.', name: 'DeepLinkService', level: 900);
+      // On error, navigate to error page where user can go back to login
       Navigator.pushNamedAndRemoveUntil(
         context,
         RoutesName.resetLinkError,
         (route) => false,
-        arguments: AuthStrings.linkExpiredMessage,
       );
     }
   }

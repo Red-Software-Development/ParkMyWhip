@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:park_my_whip/src/core/config/injection.dart';
+import 'package:park_my_whip/src/core/constants/colors.dart';
 import 'package:park_my_whip/src/core/constants/strings.dart';
 import 'package:park_my_whip/src/core/constants/text_style.dart';
 import 'package:park_my_whip/src/core/helpers/spacing.dart';
@@ -15,14 +16,20 @@ class ResetPasswordPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cubit = getIt<AuthCubit>();
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 20.w),
           child: BlocBuilder<AuthCubit, AuthState>(
+            buildWhen: (previous, current) =>
+                previous.resetPasswordError != current.resetPasswordError ||
+                previous.resetConfirmPasswordError != current.resetConfirmPasswordError ||
+                previous.isResetPasswordButtonEnabled != current.isResetPasswordButtonEnabled ||
+                previous.isLoading != current.isLoading ||
+                previous.resetPasswordFieldTrigger != current.resetPasswordFieldTrigger,
             builder: (context, state) {
-              final cubit = getIt<AuthCubit>();
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -131,15 +138,15 @@ class _ValidationRule extends StatelessWidget {
     return Row(
       children: [
         Icon(
-          isValid ? Icons.check_circle : Icons.cancel,
+          isValid ? Icons.check_rounded : Icons.clear_rounded,
           size: 20.sp,
-          color: isValid ? Colors.green : Colors.red,
+          color: isValid ? AppColor.green : AppColor.grey700,
         ),
         horizontalSpace(8),
         Expanded(
           child: Text(
             text,
-            style: AppTextStyles.urbanistFont14Grey600Regular1_5,
+            style: AppTextStyles.urbanistFont14Grey600Regular1_5.copyWith(color: isValid ? AppColor.green : AppColor.grey700),
           ),
         ),
       ],

@@ -30,6 +30,7 @@ class AuthState extends Equatable {
   final String? resetConfirmPasswordError;
   final bool isResetPasswordButtonEnabled;
   final String? passwordResetToken;
+  final int resetPasswordFieldTrigger;
 
   const AuthState({
     this.isLoading = false,
@@ -54,6 +55,7 @@ class AuthState extends Equatable {
     this.resetConfirmPasswordError,
     this.isResetPasswordButtonEnabled = false,
     this.passwordResetToken,
+    this.resetPasswordFieldTrigger = 0,
   });
 
   AuthState copyWith({
@@ -79,6 +81,7 @@ class AuthState extends Equatable {
     String? resetConfirmPasswordError,
     bool? isResetPasswordButtonEnabled,
     String? passwordResetToken,
+    int? resetPasswordFieldTrigger,
   }) {
     return AuthState(
       isLoading: isLoading ?? this.isLoading,
@@ -106,6 +109,7 @@ class AuthState extends Equatable {
       resetConfirmPasswordError: resetConfirmPasswordError,
       isResetPasswordButtonEnabled: isResetPasswordButtonEnabled ?? this.isResetPasswordButtonEnabled,
       passwordResetToken: passwordResetToken ?? this.passwordResetToken,
+      resetPasswordFieldTrigger: resetPasswordFieldTrigger ?? this.resetPasswordFieldTrigger,
     );
   }
 
@@ -133,5 +137,6 @@ class AuthState extends Equatable {
     resetConfirmPasswordError,
     isResetPasswordButtonEnabled,
     passwordResetToken,
+    resetPasswordFieldTrigger,
   ];
 }
