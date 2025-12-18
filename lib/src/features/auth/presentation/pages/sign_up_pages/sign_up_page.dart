@@ -70,10 +70,10 @@ class SignUpPage extends StatelessWidget {
                   AlreadyHaveAccountText(),
                   verticalSpace(16),
                   CommonButton(
-                    text: state.isLoading ? 'Sending OTP...' : AuthStrings.continueText,
+                    text: AuthStrings.continueText,
                     onPressed: () =>
                         getIt<AuthCubit>().validateSignupForm(context: context),
-                    isEnabled: state.isSignUpButtonEnabled && !state.isLoading,
+                    isEnabled: state.isSignUpButtonEnabled,
                   ),
                   verticalSpace(16),
                 ],

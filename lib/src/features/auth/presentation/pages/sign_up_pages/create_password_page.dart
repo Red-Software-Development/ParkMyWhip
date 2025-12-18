@@ -9,23 +9,34 @@ import 'package:park_my_whip/src/core/widgets/common_button.dart';
 import 'package:park_my_whip/src/core/widgets/custom_text_field.dart';
 import 'package:park_my_whip/src/features/auth/presentation/cubit/auth_cubit.dart';
 import 'package:park_my_whip/src/features/auth/presentation/cubit/auth_state.dart';
+import 'package:park_my_whip/src/core/widgets/common_app_bar.dart';
+import 'package:park_my_whip/src/features/auth/presentation/widgets/password_validation_rules.dart';
 
 class CreatePasswordPage extends StatelessWidget {
   const CreatePasswordPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final cubit = getIt<AuthCubit>();
     return Scaffold(
       resizeToAvoidBottomInset: false,
+      appBar: CommonAppBar(),
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 20.w),
           child: BlocBuilder<AuthCubit, AuthState>(
+            buildWhen: (previous, current) =>
+                previous.createPasswordError != current.createPasswordError ||
+                previous.confirmPasswordError != current.confirmPasswordError ||
+                previous.isCreatePasswordButtonEnabled != current.isCreatePasswordButtonEnabled ||
+                previous.isLoading != current.isLoading ||
+                previous.createPasswordFieldTrigger != current.createPasswordFieldTrigger ||
+                previous.errorMessage != current.errorMessage,
             builder: (context, state) {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  verticalSpace(50),
+                  verticalSpace(12),
                   Text(
                     AuthStrings.createPassword,
                     style: AppTextStyles.urbanistFont34Grey800SemiBold1_2,
@@ -36,10 +47,9 @@ class CreatePasswordPage extends StatelessWidget {
                     hintText: '',
                     keyboardType: TextInputType.visiblePassword,
                     textInputAction: TextInputAction.next,
-                    controller: getIt<AuthCubit>().createPasswordController,
+                    controller: cubit.createPasswordController,
                     validator: (_) => state.createPasswordError,
-                    onChanged: (_) =>
-                        getIt<AuthCubit>().onCreatePasswordFieldChanged(),
+                    onChanged: (_) => cubit.onCreatePasswordFieldChanged(),
                     isPassword: true,
                   ),
                   verticalSpace(20),
@@ -48,11 +58,14 @@ class CreatePasswordPage extends StatelessWidget {
                     hintText: '',
                     keyboardType: TextInputType.visiblePassword,
                     textInputAction: TextInputAction.done,
-                    controller: getIt<AuthCubit>().confirmPasswordController,
+                    controller: cubit.confirmPasswordController,
                     validator: (_) => state.confirmPasswordError,
-                    onChanged: (_) =>
-                        getIt<AuthCubit>().onCreatePasswordFieldChanged(),
+                    onChanged: (_) => cubit.onCreatePasswordFieldChanged(),
                     isPassword: true,
+                  ),
+                  verticalSpace(24),
+                  PasswordValidationRules(
+                    password: cubit.createPasswordController.text,
                   ),
                   verticalSpace(4),
                   Visibility(
@@ -62,13 +75,10 @@ class CreatePasswordPage extends StatelessWidget {
                       style: AppTextStyles.urbanistFont12Red500Regular1_5,
                     ),
                   ),
-                  verticalSpace(24),
-
                   Spacer(),
                   CommonButton(
                     text: state.isLoading ? 'Creating Account...' : AuthStrings.continueText,
-                    onPressed: () => getIt<AuthCubit>()
-                        .validateCreatePasswordForm(context: context),
+                    onPressed: () => cubit.validateCreatePasswordForm(context: context),
                     isEnabled: state.isCreatePasswordButtonEnabled && !state.isLoading,
                   ),
 

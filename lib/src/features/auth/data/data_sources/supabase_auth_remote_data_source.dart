@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'package:flutter/foundation.dart';
 import 'package:park_my_whip/src/core/models/supabase_user_model.dart';
 import 'package:park_my_whip/src/features/auth/data/data_sources/auth_remote_data_source.dart';
 import 'package:park_my_whip/supabase/supabase_config.dart';
@@ -87,6 +88,13 @@ class SupabaseAuthRemoteDataSource implements AuthRemoteDataSource {
       );
     } catch (e, stackTrace) {
       log('Login error: $e', name: 'SupabaseAuthRemoteDataSource', level: 900, error: e, stackTrace: stackTrace);
+      
+      // Add detailed error logging for debugging
+      if (e is AuthException) {
+        log('Auth error details - Status: ${e.statusCode}, Message: ${e.message}', 
+            name: 'SupabaseAuthRemoteDataSource', level: 900);
+      }
+      
       rethrow; // Let NetworkExceptions handle error translation
     }
   }
@@ -142,14 +150,75 @@ class SupabaseAuthRemoteDataSource implements AuthRemoteDataSource {
   }
 
   @override
-  Future<bool> sendSignUpOtp({required String email}) async {
+  Future<bool> createAccount({
+    required String email,
+    required String password,
+    required String fullName,
+  }) async {
     try {
-      log('Sending OTP to $email', name: 'SupabaseAuthRemoteDataSource', level: 800);
+      debugPrint('🔵 [SIGNUP] Creating account for $email');
 
-      // Send OTP to email using Supabase magic link/OTP
+      // Step 1: Create account in Supabase (without email confirmation)
+      final signUpResponse = await _supabaseClient.auth.signUp(
+        email: email,
+        password: password,
+        data: {'full_name': fullName},
+        emailRedirectTo: null, // Disable automatic email sending
+      );
+
+      debugPrint('🔵 [SIGNUP] SignUp response: user=${signUpResponse.user?.id}, session=${signUpResponse.session?.accessToken != null}');
+
+      if (signUpResponse.user == null) {
+        debugPrint('🔴 [SIGNUP ERROR] No user returned from Supabase');
+        throw Exception('Account creation failed. No user returned from Supabase.');
+      }
+
+      debugPrint('✅ [SIGNUP] Account created successfully. User ID: ${signUpResponse.user!.id}');
+
+      // Step 2: Create user profile in database
+      try {
+        debugPrint('🔵 [SIGNUP] Creating user profile in database...');
+        await _supabaseClient.from('users').insert({
+          'id': signUpResponse.user!.id,
+          'email': email,
+          'full_name': fullName,
+          'role': 'user',
+          'is_active': true,
+          'metadata': {},
+        });
+        debugPrint('✅ [SIGNUP] User profile created in database');
+      } catch (dbError) {
+        debugPrint('🔴 [SIGNUP ERROR] Database insert error: $dbError');
+        throw Exception('Failed to create user profile in database: $dbError');
+      }
+
+      return true;
+    } catch (e) {
+      debugPrint('🔴 [SIGNUP ERROR] Create account error: $e');
+      
+      // Add detailed error logging
+      if (e is AuthException) {
+        debugPrint('🔴 [SIGNUP ERROR] Auth error - Status: ${e.statusCode}, Message: ${e.message}');
+      }
+      if (e is PostgrestException) {
+        debugPrint('🔴 [SIGNUP ERROR] Database error - Code: ${e.code}, Message: ${e.message}');
+      }
+      
+      rethrow; // Let NetworkExceptions handle error translation
+    }
+  }
+
+  @override
+  Future<bool> sendOtpForEmailVerification({
+    required String email,
+  }) async {
+    try {
+      log('Sending OTP to $email for email verification', name: 'SupabaseAuthRemoteDataSource', level: 800);
+
+      // Send OTP for email verification
       await _supabaseClient.auth.signInWithOtp(email: email);
 
-      log('OTP sent successfully to $email', name: 'SupabaseAuthRemoteDataSource', level: 800);
+      log('OTP sent to $email', name: 'SupabaseAuthRemoteDataSource', level: 800);
       return true;
     } catch (e) {
       log('Send OTP error: $e', name: 'SupabaseAuthRemoteDataSource', level: 900, error: e);
@@ -158,85 +227,38 @@ class SupabaseAuthRemoteDataSource implements AuthRemoteDataSource {
   }
 
   @override
-  Future<SupabaseUserModel> completeSignup({
+  Future<SupabaseUserModel> verifyOtpAndCompleteSignup({
     required String email,
-    required String password,
-    required String fullName,
     required String otp,
   }) async {
     try {
-      log('Completing signup for $email', name: 'SupabaseAuthRemoteDataSource', level: 800);
+      log('Verifying OTP for $email', name: 'SupabaseAuthRemoteDataSource', level: 800);
 
-      // First verify the OTP
+      // Verify OTP to confirm email
       final verifyResponse = await _supabaseClient.auth.verifyOTP(
         email: email,
         token: otp,
         type: OtpType.email,
       );
 
-      final user = verifyResponse.user;
-      if (user == null) {
+      if (verifyResponse.user == null) {
         throw Exception('OTP verification failed.');
       }
 
-      log('OTP verified. Updating password...', name: 'SupabaseAuthRemoteDataSource', level: 800);
+      log('Email verified successfully', name: 'SupabaseAuthRemoteDataSource', level: 1000);
 
-      // Update user password after OTP verification
-      await _supabaseClient.auth.updateUser(
-        UserAttributes(
-          password: password,
-          data: {'full_name': fullName},
-        ),
-      );
-
-      log('Password updated successfully', name: 'SupabaseAuthRemoteDataSource', level: 1000);
-
-      // Check if user profile exists in users table
+      // Fetch user profile from database
       final userProfile = await _supabaseClient
           .from('users')
           .select()
-          .eq('id', user.id)
-          .maybeSingle();
+          .eq('id', verifyResponse.user!.id)
+          .single();
 
-      if (userProfile == null) {
-        log('Creating user profile in database', name: 'SupabaseAuthRemoteDataSource', level: 800);
-        // Create user profile
-        await _supabaseClient.from('users').insert({
-          'id': user.id,
-          'email': user.email ?? email,
-          'full_name': fullName,
-          'phone': user.phone,
-          'role': 'user',
-          'is_active': true,
-          'metadata': {},
-        });
-
-        // Fetch the newly created profile
-        final newProfile = await _supabaseClient
-            .from('users')
-            .select()
-            .eq('id', user.id)
-            .single();
-
-        return SupabaseUserModel(
-          id: user.id,
-          email: user.email ?? email,
-          fullName: newProfile['full_name'] ?? fullName,
-          emailVerified: user.emailConfirmedAt != null,
-          avatarUrl: newProfile['avatar_url'],
-          phoneNumber: newProfile['phone'],
-          metadata: Map<String, dynamic>.from(newProfile['metadata'] ?? {}),
-          createdAt: DateTime.parse(newProfile['created_at']),
-          updatedAt: DateTime.parse(newProfile['updated_at']),
-        );
-      }
-
-      // Return existing user profile
       return SupabaseUserModel(
-        id: user.id,
-        email: user.email ?? email,
-        fullName: userProfile['full_name'] ?? fullName,
-        emailVerified: user.emailConfirmedAt != null,
+        id: verifyResponse.user!.id,
+        email: verifyResponse.user!.email ?? email,
+        fullName: userProfile['full_name'] ?? 'User',
+        emailVerified: true,
         avatarUrl: userProfile['avatar_url'],
         phoneNumber: userProfile['phone'],
         metadata: Map<String, dynamic>.from(userProfile['metadata'] ?? {}),
@@ -244,7 +266,7 @@ class SupabaseAuthRemoteDataSource implements AuthRemoteDataSource {
         updatedAt: DateTime.parse(userProfile['updated_at']),
       );
     } catch (e) {
-      log('Complete signup error: $e', name: 'SupabaseAuthRemoteDataSource', level: 900, error: e);
+      log('OTP verification error: $e', name: 'SupabaseAuthRemoteDataSource', level: 900, error: e);
       rethrow; // Let NetworkExceptions handle error translation
     }
   }

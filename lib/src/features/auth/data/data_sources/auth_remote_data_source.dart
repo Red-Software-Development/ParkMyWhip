@@ -30,21 +30,30 @@ abstract class AuthRemoteDataSource {
   /// Throws exception on failure
   Future<bool> signOut();
 
-  /// Send OTP to email for signup verification
-  /// Returns true on success (OTP sent)
+  /// Create account in Supabase and insert user profile in database
+  /// Step 1: Creates account with email and password
+  /// Step 2: Creates user profile in database
+  /// Returns true on success
   /// Throws exception on failure
-  Future<bool> sendSignUpOtp({
-    required String email,
-  });
-
-  /// Complete signup after OTP verification
-  /// Creates account with email and password
-  /// Returns [SupabaseUserModel] on success
-  /// Throws exception on failure
-  Future<SupabaseUserModel> completeSignup({
+  Future<bool> createAccount({
     required String email,
     required String password,
     required String fullName,
+  });
+
+  /// Send OTP for email verification
+  /// Returns true on success
+  /// Throws exception on failure
+  Future<bool> sendOtpForEmailVerification({
+    required String email,
+  });
+
+  /// Verify OTP and complete signup
+  /// Verifies email with OTP code
+  /// Returns [SupabaseUserModel] on success
+  /// Throws exception on failure
+  Future<SupabaseUserModel> verifyOtpAndCompleteSignup({
+    required String email,
     required String otp,
   });
 }

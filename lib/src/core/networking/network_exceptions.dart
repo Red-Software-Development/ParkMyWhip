@@ -54,8 +54,11 @@ abstract class NetworkExceptions {
 
     // Common auth error patterns
     if (message.contains('invalid login credentials') ||
-        message.contains('invalid credentials')) {
-      return 'Invalid email or password. Please try again.';
+        message.contains('invalid credentials') ||
+        message.contains('email not confirmed') ||
+        message.contains('email not verified') ||
+        message.contains('user not confirmed')) {
+      return 'Invalid email or password. If you just signed up, please verify your email first.';
     }
 
     if (message.contains('email not confirmed') ||
@@ -137,8 +140,12 @@ abstract class NetworkExceptions {
       return 'Verification failed. Please try again.';
     }
 
+    if (message.contains('database') || message.contains('insert')) {
+      return 'Failed to save user data. Please try again.';
+    }
+
     // Generic auth failure
-    return 'Authentication failed. Please check your credentials and try again.';
+    return 'Authentication failed. Please check your information and try again.';
   }
 
   /// Maps Supabase PostgrestException to user-friendly messages

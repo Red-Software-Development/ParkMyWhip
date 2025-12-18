@@ -7,8 +7,6 @@ import 'package:park_my_whip/src/core/routes/names.dart';
 import 'package:park_my_whip/src/core/services/supabase_user_service.dart';
 import 'package:park_my_whip/src/features/auth/data/data_sources/auth_remote_data_source.dart';
 import 'package:park_my_whip/src/features/auth/domain/validators.dart';
-import 'package:park_my_whip/supabase/supabase_config.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'auth_state.dart' as app_auth;
 
 class AuthCubit extends Cubit<app_auth.AuthState> {
@@ -58,7 +56,7 @@ class AuthCubit extends Cubit<app_auth.AuthState> {
     }
   }
 
-  // Validate signup form on continue button press (Step 1: Name + Email → Send OTP)
+  // Validate signup form on continue button press (Step 1: Name + Email → Navigate to Create Password)
   Future<void> validateSignupForm({required BuildContext context}) async {
     final nameError = validators.nameValidator(
       signUpNameController.text.trim(),
@@ -77,39 +75,15 @@ class AuthCubit extends Cubit<app_auth.AuthState> {
       return;
     }
 
-    // If no errors, send OTP to email
-    await sendSignUpOtp(context: context);
-  }
-
-  Future<void> sendSignUpOtp({required BuildContext context}) async {
-    try {
-      // Clear previous errors and show loading
-      emit(state.copyWith(
-        isLoading: true,
-        errorMessage: null,
-        signUpNameError: null,
-        signUpEmailError: null,
-      ));
-
-      final email = signUpEmailController.text.trim();
-
-      // Call data source to send OTP
-      await authRemoteDataSource.sendSignUpOtp(email: email);
-
-      log('OTP sent successfully to $email', name: 'AuthCubit', level: 800);
-
-      // Navigate to OTP page
-      emit(state.copyWith(isLoading: false));
-      if (context.mounted) {
-        Navigator.pushNamed(context, RoutesName.enterOtpCode);
-      }
-    } catch (e) {
-      log('Send OTP error: $e', name: 'AuthCubit', level: 900, error: e);
-      final errorMessage = NetworkExceptions.getSupabaseExceptionMessage(e);
-      emit(state.copyWith(
-        isLoading: false,
-        errorMessage: errorMessage,
-      ));
+    // If no errors, navigate to create password page
+    emit(state.copyWith(
+      signUpNameError: null,
+      signUpEmailError: null,
+      errorMessage: null,
+    ));
+    
+    if (context.mounted) {
+      Navigator.pushNamed(context, RoutesName.createPassword);
     }
   }
 
@@ -132,15 +106,47 @@ class AuthCubit extends Cubit<app_auth.AuthState> {
     }
   }
 
-  // Validate otp form on continue button press (Step 2: Verify OTP → Navigate to Create Password)
-  void continueFromOTPPage({required BuildContext context}) {
+  // Validate otp form on continue button press (Step 3: Verify OTP → Navigate to Dashboard)
+  Future<void> continueFromOTPPage({required BuildContext context}) async {
     final otp = otpController.text.trim();
     
-    if (otp.length == 6) {
-      // OTP entered, navigate to create password page
-      Navigator.pushNamed(context, RoutesName.createPassword);
-    } else {
+    if (otp.length != 6) {
       emit(state.copyWith(otpError: 'Please enter a valid 6-digit OTP'));
+      return;
+    }
+
+    try {
+      // Clear previous errors and show loading
+      emit(state.copyWith(
+        isLoading: true,
+        otpError: null,
+      ));
+
+      final email = signUpEmailController.text.trim();
+
+      // Call data source to verify OTP and complete signup
+      final supabaseUser = await authRemoteDataSource.verifyOtpAndCompleteSignup(
+        email: email,
+        otp: otp,
+      );
+
+      log('Signup completed successfully. User: ${supabaseUser.id}', name: 'AuthCubit', level: 1000);
+
+      // Save user data to local storage
+      await supabaseUserService.cacheUser(supabaseUser);
+
+      emit(state.copyWith(isLoading: false));
+
+      if (context.mounted) {
+        Navigator.pushReplacementNamed(context, RoutesName.dashboard);
+      }
+    } catch (e) {
+      log('OTP verification error: $e', name: 'AuthCubit', level: 900, error: e);
+      final errorMessage = NetworkExceptions.getSupabaseExceptionMessage(e);
+      emit(state.copyWith(
+        isLoading: false,
+        otpError: errorMessage,
+      ));
     }
   }
   //********************************************** create password ************************** */
@@ -149,8 +155,18 @@ class AuthCubit extends Cubit<app_auth.AuthState> {
     final hasPassword = createPasswordController.text.trim().isNotEmpty;
     final hasConfirmPassword = confirmPasswordController.text.trim().isNotEmpty;
     final shouldEnable = hasPassword && hasConfirmPassword;
+    
+    // Update button state and trigger rebuild for validation rules
     if (state.isCreatePasswordButtonEnabled != shouldEnable) {
-      emit(state.copyWith(isCreatePasswordButtonEnabled: shouldEnable));
+      emit(state.copyWith(
+        isCreatePasswordButtonEnabled: shouldEnable,
+        createPasswordFieldTrigger: state.createPasswordFieldTrigger + 1,
+      ));
+    } else {
+      // Trigger rebuild for validation rules even if button state unchanged
+      emit(state.copyWith(
+        createPasswordFieldTrigger: state.createPasswordFieldTrigger + 1,
+      ));
     }
   }
 
@@ -173,11 +189,11 @@ class AuthCubit extends Cubit<app_auth.AuthState> {
       return;
     }
 
-    // If no errors, complete signup with OTP verification
-    await completeSignup(context: context);
+    // If no errors, create account in Supabase (without sending OTP yet)
+    await createAccount(context: context);
   }
 
-  Future<void> completeSignup({required BuildContext context}) async {
+  Future<void> createAccount({required BuildContext context}) async {
     try {
       // Clear previous errors and show loading
       emit(state.copyWith(
@@ -190,33 +206,45 @@ class AuthCubit extends Cubit<app_auth.AuthState> {
       final email = signUpEmailController.text.trim();
       final password = createPasswordController.text.trim();
       final fullName = signUpNameController.text.trim();
-      final otp = otpController.text.trim();
 
-      // Call data source to verify OTP and complete signup
-      final supabaseUser = await authRemoteDataSource.completeSignup(
+      // Call data source to create account (without OTP)
+      await authRemoteDataSource.createAccount(
         email: email,
         password: password,
         fullName: fullName,
-        otp: otp,
       );
 
-      log('Signup completed successfully. User: ${supabaseUser.id}', name: 'AuthCubit', level: 1000);
+      log('Account created successfully', name: 'AuthCubit', level: 1000);
 
-      // Save user data to local storage
-      await supabaseUserService.cacheUser(supabaseUser);
-
-      // Navigate to dashboard
+      // Navigate to OTP page (OTP will be sent when page loads)
       emit(state.copyWith(isLoading: false));
       if (context.mounted) {
-        Navigator.pushReplacementNamed(context, RoutesName.dashboard);
+        Navigator.pushNamed(context, RoutesName.enterOtpCode);
       }
     } catch (e) {
-      log('Complete signup error: $e', name: 'AuthCubit', level: 900, error: e);
+      log('Create account error: $e', name: 'AuthCubit', level: 900, error: e);
       final errorMessage = NetworkExceptions.getSupabaseExceptionMessage(e);
       emit(state.copyWith(
         isLoading: false,
         errorMessage: errorMessage,
       ));
+    }
+  }
+
+  // Send OTP for email verification (called when OTP page loads)
+  Future<void> sendOtpForEmailVerification() async {
+    try {
+      final email = signUpEmailController.text.trim();
+
+      // Call data source to send OTP
+      await authRemoteDataSource.sendOtpForEmailVerification(
+        email: email,
+      );
+
+      log('OTP sent to $email', name: 'AuthCubit', level: 1000);
+    } catch (e) {
+      log('Send OTP error: $e', name: 'AuthCubit', level: 900, error: e);
+      // Don't emit error state here, let user try to verify anyway
     }
   }
 
