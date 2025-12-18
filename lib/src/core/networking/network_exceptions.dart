@@ -144,8 +144,14 @@ abstract class NetworkExceptions {
       return 'Failed to save user data. Please try again.';
     }
 
+    if (message.contains('new password should be different from the old password')) {
+      return 'New password should be different from the old password.';
+    }
+
     // Generic auth failure
-    return 'Authentication failed. Please check your information and try again.';
+    return error.message.isNotEmpty
+        ? error.message
+        : 'Authentication failed. Please check your information and try again.';
   }
 
   /// Maps Supabase PostgrestException to user-friendly messages

@@ -16,7 +16,7 @@ void main() async {
   DeepLinkService.initialize();
 
   // Determine initial route based on authentication status
-  final initialRoute = await AppRouter.getInitialRoute();
+  // final initialRoute = await AppRouter.getInitialRoute();
 
-  runApp(ParkMyWhipApp(initialRoute: initialRoute));
+  runApp(ParkMyWhipApp(initialRoute: RoutesName.initial));
 }
