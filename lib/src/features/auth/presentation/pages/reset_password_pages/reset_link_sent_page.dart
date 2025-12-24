@@ -8,8 +8,9 @@ import 'package:park_my_whip/src/core/constants/text_style.dart';
 import 'package:park_my_whip/src/core/helpers/spacing.dart';
 import 'package:park_my_whip/src/core/widgets/common_button.dart';
 import 'package:park_my_whip/src/core/widgets/error_dialog.dart';
-import 'package:park_my_whip/src/features/auth/presentation/cubit/auth_cubit.dart';
-import 'package:park_my_whip/src/features/auth/presentation/cubit/auth_state.dart';
+import 'package:park_my_whip/src/core/helpers/countdown_helper.dart';
+import 'package:park_my_whip/src/features/auth/presentation/cubit/reset_password_cubit/reset_password_cubit.dart';
+import 'package:park_my_whip/src/features/auth/presentation/cubit/reset_password_cubit/reset_password_state.dart';
 
 /// Success page displayed after sending password reset email
 class ResetLinkSentPage extends StatelessWidget {
@@ -17,7 +18,7 @@ class ResetLinkSentPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<AuthCubit, AuthState>(
+    return BlocConsumer<ResetPasswordCubit, ResetPasswordState>(
       listener: (context, state) {
         // Show error dialog if resend fails
         if (state.forgotPasswordEmailError != null && state.forgotPasswordEmailError!.isNotEmpty) {
@@ -72,7 +73,7 @@ class ResetLinkSentPage extends StatelessWidget {
                       // Resend button or countdown
                       if (state.canResendEmail)
                         TextButton(
-                          onPressed: state.isLoading ? null : () => context.read<AuthCubit>().resendPasswordResetEmail(context: context),
+                          onPressed: state.isLoading ? null : () => context.read<ResetPasswordCubit>().resendPasswordResetEmail(context: context),
                           child: state.isLoading
                               ? SizedBox(
                                   width: 16.w,
@@ -91,7 +92,7 @@ class ResetLinkSentPage extends StatelessWidget {
                         Padding(
                           padding: EdgeInsets.only(bottom: 8.h),
                           child: Text(
-                            '${AuthStrings.resendIn} ${AuthCubit.formatCountdownTime(state.resendCountdownSeconds)}',
+                            '${AuthStrings.resendIn} ${CountdownHelper.formatCountdownTime(state.resendCountdownSeconds)}',
                             style: AppTextStyles.urbanistFont16RichRedSemiBold1_2,
                           ),
                         ),
@@ -101,7 +102,7 @@ class ResetLinkSentPage extends StatelessWidget {
                       // Go to login button
                       CommonButton(
                         text: AuthStrings.goToLogin,
-                        onPressed: () => context.read<AuthCubit>().navigateFromResetLinkToLogin(context: context),
+                        onPressed: () => context.read<ResetPasswordCubit>().navigateFromResetLinkToLogin(context: context),
                       ),
                     ],
                   ),

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:park_my_whip/src/core/routes/names.dart';
 import 'src/core/config/injection.dart';
-import 'src/core/routes/router.dart';
 import 'src/core/services/deep_link_service.dart';
 import 'supabase/supabase_config.dart';
 import 'park_my_whip_app.dart';

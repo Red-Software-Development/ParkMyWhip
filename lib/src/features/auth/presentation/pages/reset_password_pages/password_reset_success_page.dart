@@ -7,7 +7,7 @@ import 'package:park_my_whip/src/core/constants/strings.dart';
 import 'package:park_my_whip/src/core/constants/text_style.dart';
 import 'package:park_my_whip/src/core/helpers/spacing.dart';
 import 'package:park_my_whip/src/core/widgets/common_button.dart';
-import 'package:park_my_whip/src/features/auth/presentation/cubit/auth_cubit.dart';
+import 'package:park_my_whip/src/features/auth/presentation/cubit/reset_password_cubit/reset_password_cubit.dart';
 
 /// Success page displayed after successfully resetting password
 class PasswordResetSuccessPage extends StatelessWidget {
@@ -53,7 +53,7 @@ class PasswordResetSuccessPage extends StatelessWidget {
               padding: EdgeInsets.symmetric(horizontal: 24.w).copyWith(bottom: 16.h),
               child: CommonButton(
                 text: AuthStrings.goToLogin,
-                onPressed: () => context.read<AuthCubit>().navigateFromResetSuccessToLogin(context: context),
+                onPressed: () => context.read<ResetPasswordCubit>().navigateFromResetSuccessToLogin(context: context),
               ),
             ),
           ],

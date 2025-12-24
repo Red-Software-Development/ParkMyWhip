@@ -3,7 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:park_my_whip/src/core/config/injection.dart';
 import 'package:park_my_whip/src/core/data/result.dart';
 import 'package:park_my_whip/src/features/auth/domain/repositories/auth_repository.dart';
-import 'package:park_my_whip/src/features/auth/presentation/cubit/auth_cubit.dart';
+import 'package:park_my_whip/src/features/auth/presentation/cubit/sign_up_cubit/sign_up_cubit.dart';
+import 'package:park_my_whip/src/features/auth/presentation/cubit/login_cubit/login_cubit.dart';
+import 'package:park_my_whip/src/features/auth/presentation/cubit/reset_password_cubit/reset_password_cubit.dart';
 import 'package:park_my_whip/src/features/auth/presentation/pages/reset_password_pages/forgot_password_page.dart';
 import 'package:park_my_whip/src/features/auth/presentation/pages/login_page.dart';
 import 'package:park_my_whip/src/features/auth/presentation/pages/reset_password_pages/password_reset_success_page.dart';
@@ -49,7 +51,7 @@ class AppRouter {
       case RoutesName.signup:
         return MaterialPageRoute(
           builder: (_) => BlocProvider.value(
-            value: getIt<AuthCubit>(),
+            value: getIt<SignUpCubit>(),
             child: const SignUpPage(),
           ),
         );
@@ -57,14 +59,14 @@ class AppRouter {
       case RoutesName.enterOtpCode:
         return MaterialPageRoute(
           builder: (_) => BlocProvider.value(
-            value: getIt<AuthCubit>(),
+            value: getIt<SignUpCubit>(),
             child: const EnterOtpCodePage(),
           ),
         );
       case RoutesName.createPassword:
         return MaterialPageRoute(
           builder: (_) => BlocProvider.value(
-            value: getIt<AuthCubit>(),
+            value: getIt<SignUpCubit>(),
             child: const CreatePasswordPage(),
           ),
         );
@@ -72,7 +74,7 @@ class AppRouter {
       case RoutesName.login:
         return MaterialPageRoute(
           builder: (_) => BlocProvider.value(
-            value: getIt<AuthCubit>(),
+            value: getIt<LoginCubit>(),
             child: const LoginPage(),
           ),
         );
@@ -86,21 +88,21 @@ class AppRouter {
       case RoutesName.forgotPassword:
         return MaterialPageRoute(
           builder: (_) => BlocProvider.value(
-            value: getIt<AuthCubit>(),
+            value: getIt<ResetPasswordCubit>(),
             child: const ForgotPasswordPage(),
           ),
         );
       case RoutesName.resetLinkSent:
         return MaterialPageRoute(
           builder: (_) => BlocProvider.value(
-            value: getIt<AuthCubit>(),
+            value: getIt<ResetPasswordCubit>(),
             child: const ResetLinkSentPage(),
           ),
         );
       case RoutesName.resetPassword:
         return MaterialPageRoute(
           builder: (_) => BlocProvider.value(
-            value: getIt<AuthCubit>(),
+            value: getIt<ResetPasswordCubit>(),
             child: const ResetPasswordPage(),
           ),
         );
@@ -111,7 +113,7 @@ class AppRouter {
       case RoutesName.passwordResetSuccess:
         return MaterialPageRoute(
           builder: (_) => BlocProvider.value(
-            value: getIt<AuthCubit>(),
+            value: getIt<ResetPasswordCubit>(),
             child: const PasswordResetSuccessPage(),
           ),
         );

@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:park_my_whip/src/core/config/injection.dart';
 import 'package:park_my_whip/src/core/constants/colors.dart';
 import 'package:park_my_whip/src/core/constants/text_style.dart';
-import 'package:park_my_whip/src/features/auth/presentation/cubit/auth_cubit.dart';
+import 'package:park_my_whip/src/features/auth/presentation/cubit/sign_up_cubit/sign_up_cubit.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 
 class OtpWidget extends StatelessWidget {
@@ -42,7 +42,7 @@ class OtpWidget extends StatelessWidget {
             ),
             animationDuration: Duration(milliseconds: 300),
             enableActiveFill: true,
-            controller: getIt<AuthCubit>().otpController,
+            controller: getIt<SignUpCubit>().otpController,
             onChanged: (value) {
               onChanged(value);
             },

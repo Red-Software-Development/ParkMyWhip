@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:park_my_whip/src/core/config/injection.dart';
 import 'package:park_my_whip/src/core/constants/strings.dart';
 import 'package:park_my_whip/src/core/constants/text_style.dart';
-import 'package:park_my_whip/src/features/auth/presentation/cubit/auth_cubit.dart';
+import 'package:park_my_whip/src/features/auth/presentation/cubit/login_cubit/login_cubit.dart';
 
 class DontHaveAccountText extends StatelessWidget {
   const DontHaveAccountText({super.key});
@@ -22,7 +22,7 @@ class DontHaveAccountText extends StatelessWidget {
               style: AppTextStyles.urbanistFont15Grey700SemiBold1_33,
               recognizer: TapGestureRecognizer()
                 ..onTap = () =>
-                    getIt<AuthCubit>().navigateToSignUpPage(context: context),
+                    getIt<LoginCubit>().navigateToSignUpPage(context: context),
             ),
           ],
         ),

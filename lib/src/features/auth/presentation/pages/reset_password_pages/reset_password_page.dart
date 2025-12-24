@@ -9,21 +9,21 @@ import 'package:park_my_whip/src/core/helpers/spacing.dart';
 import 'package:park_my_whip/src/core/widgets/common_button.dart';
 import 'package:park_my_whip/src/core/widgets/custom_text_field.dart';
 import 'package:park_my_whip/src/features/auth/presentation/widgets/password_validation_rules.dart';
-import 'package:park_my_whip/src/features/auth/presentation/cubit/auth_cubit.dart';
-import 'package:park_my_whip/src/features/auth/presentation/cubit/auth_state.dart';
+import 'package:park_my_whip/src/features/auth/presentation/cubit/reset_password_cubit/reset_password_cubit.dart';
+import 'package:park_my_whip/src/features/auth/presentation/cubit/reset_password_cubit/reset_password_state.dart';
 
 class ResetPasswordPage extends StatelessWidget {
   const ResetPasswordPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final cubit = getIt<AuthCubit>();
+    final cubit = getIt<ResetPasswordCubit>();
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 20.w),
-          child: BlocBuilder<AuthCubit, AuthState>(
+          child: BlocBuilder<ResetPasswordCubit, ResetPasswordState>(
             buildWhen: (previous, current) =>
                 previous.resetPasswordError != current.resetPasswordError ||
                 previous.resetConfirmPasswordError != current.resetConfirmPasswordError ||

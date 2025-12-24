@@ -7,8 +7,9 @@ import 'package:park_my_whip/src/core/constants/text_style.dart';
 import 'package:park_my_whip/src/core/helpers/spacing.dart';
 import 'package:park_my_whip/src/core/widgets/common_button.dart';
 import 'package:park_my_whip/src/core/widgets/custom_text_field.dart';
-import 'package:park_my_whip/src/features/auth/presentation/cubit/auth_cubit.dart';
-import 'package:park_my_whip/src/features/auth/presentation/cubit/auth_state.dart';
+import 'package:park_my_whip/src/features/auth/presentation/cubit/login_cubit/login_cubit.dart';
+import 'package:park_my_whip/src/features/auth/presentation/cubit/login_cubit/login_state.dart';
+import 'package:park_my_whip/src/features/auth/presentation/cubit/sign_up_cubit/sign_up_cubit.dart';
 import 'package:park_my_whip/src/features/auth/presentation/widgets/dont_have_account_text.dart';
 import 'package:park_my_whip/src/features/auth/presentation/widgets/forgot_password.dart';
 
@@ -25,11 +26,12 @@ class _LoginPageState extends State<LoginPage> {
     super.initState();
     // Pre-fill email if redirected from signup
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final cubit = getIt<AuthCubit>();
-      if (cubit.state.redirectEmail != null) {
-        cubit.loginEmailController.text = cubit.state.redirectEmail!;
+      final signUpCubit = getIt<SignUpCubit>();
+      final loginCubit = getIt<LoginCubit>();
+      if (signUpCubit.state.redirectEmail != null) {
+        loginCubit.prefillEmail(signUpCubit.state.redirectEmail!);
         // Clear redirect email after using it
-        cubit.emit(cubit.state.copyWith(clearRedirectEmail: true));
+        signUpCubit.emit(signUpCubit.state.copyWith(clearRedirectEmail: true));
       }
     });
   }
@@ -41,7 +43,7 @@ class _LoginPageState extends State<LoginPage> {
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 20.w),
-          child: BlocBuilder<AuthCubit, AuthState>(
+          child: BlocBuilder<LoginCubit, LoginState>(
             builder: (context, state) {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -62,9 +64,9 @@ class _LoginPageState extends State<LoginPage> {
                     hintText: AuthStrings.emailHint,
                     keyboardType: TextInputType.emailAddress,
                     textInputAction: TextInputAction.done,
-                    controller: getIt<AuthCubit>().loginEmailController,
+                    controller: getIt<LoginCubit>().loginEmailController,
                     validator: (_) => state.loginEmailError,
-                    onChanged: (_) => getIt<AuthCubit>().onLoginFieldChanged(),
+                    onChanged: (_) => getIt<LoginCubit>().onLoginFieldChanged(),
                   ),
                   verticalSpace(20),
                   CustomTextField(
@@ -73,9 +75,9 @@ class _LoginPageState extends State<LoginPage> {
                     keyboardType: TextInputType.visiblePassword,
                     textInputAction: TextInputAction.done,
                     isPassword: true,
-                    controller: getIt<AuthCubit>().loginPasswordController,
+                    controller: getIt<LoginCubit>().loginPasswordController,
                     validator: (_) => state.loginPasswordError,
-                    onChanged: (_) => getIt<AuthCubit>().onLoginFieldChanged(),
+                    onChanged: (_) => getIt<LoginCubit>().onLoginFieldChanged(),
                   ),
                   verticalSpace(4),
                   Visibility(
@@ -92,7 +94,7 @@ class _LoginPageState extends State<LoginPage> {
                   verticalSpace(24),
                   CommonButton(
                     text: state.isLoading ? 'Logging in...' : AuthStrings.login,
-                    onPressed: () => getIt<AuthCubit>().validateLoginForm(context: context),
+                    onPressed: () => getIt<LoginCubit>().validateLoginForm(context: context),
                     isEnabled: state.isLoginButtonEnabled && !state.isLoading,
                   ),
 

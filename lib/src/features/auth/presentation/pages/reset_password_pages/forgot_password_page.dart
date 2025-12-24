@@ -8,8 +8,8 @@ import 'package:park_my_whip/src/core/helpers/spacing.dart';
 import 'package:park_my_whip/src/core/widgets/common_app_bar_no_scaffold.dart';
 import 'package:park_my_whip/src/core/widgets/common_button.dart';
 import 'package:park_my_whip/src/core/widgets/custom_text_field.dart';
-import 'package:park_my_whip/src/features/auth/presentation/cubit/auth_cubit.dart';
-import 'package:park_my_whip/src/features/auth/presentation/cubit/auth_state.dart';
+import 'package:park_my_whip/src/features/auth/presentation/cubit/reset_password_cubit/reset_password_cubit.dart';
+import 'package:park_my_whip/src/features/auth/presentation/cubit/reset_password_cubit/reset_password_state.dart';
 import 'package:park_my_whip/src/core/widgets/common_app_bar.dart';
 
 class ForgotPasswordPage extends StatelessWidget {
@@ -26,7 +26,7 @@ class ForgotPasswordPage extends StatelessWidget {
             Expanded(
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20.w),
-                child: BlocBuilder<AuthCubit, AuthState>(
+                child: BlocBuilder<ResetPasswordCubit, ResetPasswordState>(
                   builder: (context, state) {
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -47,14 +47,14 @@ class ForgotPasswordPage extends StatelessWidget {
                           hintText: AuthStrings.emailHint,
                           keyboardType: TextInputType.emailAddress,
                           textInputAction: TextInputAction.done,
-                          controller: getIt<AuthCubit>().forgotPasswordEmailController,
+                          controller: getIt<ResetPasswordCubit>().forgotPasswordEmailController,
                           validator: (_) => state.forgotPasswordEmailError,
-                          onChanged: (_) => getIt<AuthCubit>().onForgotPasswordFieldChanged(),
+                          onChanged: (_) => getIt<ResetPasswordCubit>().onForgotPasswordFieldChanged(),
                         ),
                         Spacer(),
                         CommonButton(
                           text: state.isLoading ? 'Sending...' : AuthStrings.continueText,
-                          onPressed: () => getIt<AuthCubit>().validateForgotPasswordForm(context: context),
+                          onPressed: () => getIt<ResetPasswordCubit>().validateForgotPasswordForm(context: context),
                           isEnabled: state.isForgotPasswordButtonEnabled && !state.isLoading,
                         ),
                         verticalSpace(16),

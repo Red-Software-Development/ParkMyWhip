@@ -6,8 +6,9 @@ import 'package:park_my_whip/src/core/constants/strings.dart';
 import 'package:park_my_whip/src/core/constants/text_style.dart';
 import 'package:park_my_whip/src/core/helpers/spacing.dart';
 import 'package:park_my_whip/src/core/widgets/common_button.dart';
-import 'package:park_my_whip/src/features/auth/presentation/cubit/auth_cubit.dart';
-import 'package:park_my_whip/src/features/auth/presentation/cubit/auth_state.dart';
+import 'package:park_my_whip/src/core/helpers/countdown_helper.dart';
+import 'package:park_my_whip/src/features/auth/presentation/cubit/sign_up_cubit/sign_up_cubit.dart';
+import 'package:park_my_whip/src/features/auth/presentation/cubit/sign_up_cubit/sign_up_state.dart';
 import 'package:park_my_whip/src/features/auth/presentation/widgets/otp_widget.dart';
 
 class EnterOtpCodePage extends StatefulWidget {
@@ -23,7 +24,7 @@ class _EnterOtpCodePageState extends State<EnterOtpCodePage> {
     super.initState();
     // Send OTP when page loads and start countdown
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<AuthCubit>().sendOtpOnPageLoad(context: context);
+      context.read<SignUpCubit>().sendOtpOnPageLoad(context: context);
     });
   }
 
@@ -34,7 +35,7 @@ class _EnterOtpCodePageState extends State<EnterOtpCodePage> {
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 20.w),
-          child: BlocBuilder<AuthCubit, AuthState>(
+          child: BlocBuilder<SignUpCubit, SignUpState>(
             builder: (context, state) {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -53,7 +54,7 @@ class _EnterOtpCodePageState extends State<EnterOtpCodePage> {
                   OtpWidget(
                     errorMessage: state.otpError,
                     onChanged: (text) {
-                      context.read<AuthCubit>().onOtpFieldChanged(text: text);
+                      context.read<SignUpCubit>().onOtpFieldChanged(text: text);
                     },
                   ),
                   Spacer(),
@@ -63,7 +64,7 @@ class _EnterOtpCodePageState extends State<EnterOtpCodePage> {
                         ? TextButton(
                             onPressed: state.isLoading
                                 ? null
-                                : () => context.read<AuthCubit>().resendOtp(context: context),
+                                : () => context.read<SignUpCubit>().resendOtp(context: context),
                             child: state.isLoading
                                 ? SizedBox(
                                     width: 16.w,
@@ -79,7 +80,7 @@ class _EnterOtpCodePageState extends State<EnterOtpCodePage> {
                                   ),
                           )
                         : Text(
-                            '${AuthStrings.resendIn} ${AuthCubit.formatCountdownTime(state.otpResendCountdownSeconds)}',
+                            '${AuthStrings.resendIn} ${CountdownHelper.formatCountdownTime(state.otpResendCountdownSeconds)}',
                             style: AppTextStyles.urbanistFont16RichRedSemiBold1_2,
                           ),
                   ),
@@ -87,7 +88,7 @@ class _EnterOtpCodePageState extends State<EnterOtpCodePage> {
                   CommonButton(
                     text: state.isLoading ? 'Verifying...' : AuthStrings.continueText,
                     onPressed: () {
-                      context.read<AuthCubit>().continueFromOTPPage(context: context);
+                      context.read<SignUpCubit>().continueFromOTPPage(context: context);
                     },
                     isEnabled: state.isOtpButtonEnabled && !state.isLoading,
                   ),

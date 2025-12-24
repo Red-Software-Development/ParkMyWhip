@@ -8,8 +8,8 @@ import 'package:park_my_whip/src/core/helpers/spacing.dart';
 import 'package:park_my_whip/src/core/widgets/common_app_bar.dart';
 import 'package:park_my_whip/src/core/widgets/common_button.dart';
 import 'package:park_my_whip/src/core/widgets/custom_text_field.dart';
-import 'package:park_my_whip/src/features/auth/presentation/cubit/auth_cubit.dart';
-import 'package:park_my_whip/src/features/auth/presentation/cubit/auth_state.dart';
+import 'package:park_my_whip/src/features/auth/presentation/cubit/sign_up_cubit/sign_up_cubit.dart';
+import 'package:park_my_whip/src/features/auth/presentation/cubit/sign_up_cubit/sign_up_state.dart';
 import 'package:park_my_whip/src/features/auth/presentation/widgets/already_have_account_text.dart';
 
 class SignUpPage extends StatelessWidget {
@@ -23,7 +23,7 @@ class SignUpPage extends StatelessWidget {
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 20.w),
-          child: BlocBuilder<AuthCubit, AuthState>(
+          child: BlocBuilder<SignUpCubit, SignUpState>(
             builder: (context, state) {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -44,9 +44,9 @@ class SignUpPage extends StatelessWidget {
                     hintText: AuthStrings.nameHint,
                     keyboardType: TextInputType.name,
                     textInputAction: TextInputAction.next,
-                    controller: getIt<AuthCubit>().signUpNameController,
+                    controller: getIt<SignUpCubit>().signUpNameController,
                     validator: (_) => state.signUpNameError,
-                    onChanged: (_) => getIt<AuthCubit>().onSignUpFieldChanged(),
+                    onChanged: (_) => getIt<SignUpCubit>().onSignUpFieldChanged(),
                   ),
                   verticalSpace(20),
                   CustomTextField(
@@ -54,9 +54,9 @@ class SignUpPage extends StatelessWidget {
                     hintText: AuthStrings.emailHint,
                     keyboardType: TextInputType.emailAddress,
                     textInputAction: TextInputAction.done,
-                    controller: getIt<AuthCubit>().signUpEmailController,
+                    controller: getIt<SignUpCubit>().signUpEmailController,
                     validator: (_) => state.signUpEmailError,
-                    onChanged: (_) => getIt<AuthCubit>().onSignUpFieldChanged(),
+                    onChanged: (_) => getIt<SignUpCubit>().onSignUpFieldChanged(),
                   ),
                   verticalSpace(4),
                   Visibility(
@@ -72,7 +72,7 @@ class SignUpPage extends StatelessWidget {
                   CommonButton(
                     text: AuthStrings.continueText,
                     onPressed: () =>
-                        getIt<AuthCubit>().validateSignupForm(context: context),
+                        getIt<SignUpCubit>().validateSignupForm(context: context),
                     isEnabled: state.isSignUpButtonEnabled,
                     isLoading: state.isLoading,
                   ),

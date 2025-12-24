@@ -9,7 +9,9 @@ import 'package:park_my_whip/src/features/auth/data/repositories/user_profile_re
 import 'package:park_my_whip/src/features/auth/data/services/user_cache_service.dart';
 import 'package:park_my_whip/src/features/auth/domain/repositories/auth_repository.dart';
 import 'package:park_my_whip/src/features/auth/domain/validators.dart';
-import 'package:park_my_whip/src/features/auth/presentation/cubit/auth_cubit.dart';
+import 'package:park_my_whip/src/features/auth/presentation/cubit/sign_up_cubit/sign_up_cubit.dart';
+import 'package:park_my_whip/src/features/auth/presentation/cubit/login_cubit/login_cubit.dart';
+import 'package:park_my_whip/src/features/auth/presentation/cubit/reset_password_cubit/reset_password_cubit.dart';
 import 'package:park_my_whip/src/features/home/presentation/cubit/dashboard_cubit/dashboard_cubit.dart';
 import 'package:park_my_whip/src/features/home/presentation/cubit/history_cubit/history_cubit.dart';
 import 'package:park_my_whip/src/features/home/presentation/cubit/patrol_cubit/patrol_cubit.dart';
@@ -60,8 +62,22 @@ void setupDependencyInjection() {
   getIt.registerLazySingleton<Validators>(() => Validators());
 
   // ========== Auth Feature - Presentation Layer ==========
-  getIt.registerLazySingleton<AuthCubit>(
-    () => AuthCubit(
+  getIt.registerLazySingleton<SignUpCubit>(
+    () => SignUpCubit(
+      authRepository: getIt<AuthRepository>(),
+      validators: getIt<Validators>(),
+    ),
+  );
+  
+  getIt.registerLazySingleton<LoginCubit>(
+    () => LoginCubit(
+      authRepository: getIt<AuthRepository>(),
+      validators: getIt<Validators>(),
+    ),
+  );
+  
+  getIt.registerLazySingleton<ResetPasswordCubit>(
+    () => ResetPasswordCubit(
       authRepository: getIt<AuthRepository>(),
       validators: getIt<Validators>(),
     ),

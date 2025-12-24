@@ -7,8 +7,8 @@ import 'package:park_my_whip/src/core/constants/text_style.dart';
 import 'package:park_my_whip/src/core/helpers/spacing.dart';
 import 'package:park_my_whip/src/core/widgets/common_button.dart';
 import 'package:park_my_whip/src/core/widgets/custom_text_field.dart';
-import 'package:park_my_whip/src/features/auth/presentation/cubit/auth_cubit.dart';
-import 'package:park_my_whip/src/features/auth/presentation/cubit/auth_state.dart';
+import 'package:park_my_whip/src/features/auth/presentation/cubit/sign_up_cubit/sign_up_cubit.dart';
+import 'package:park_my_whip/src/features/auth/presentation/cubit/sign_up_cubit/sign_up_state.dart';
 import 'package:park_my_whip/src/core/widgets/common_app_bar.dart';
 import 'package:park_my_whip/src/features/auth/presentation/widgets/password_validation_rules.dart';
 
@@ -17,14 +17,14 @@ class CreatePasswordPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cubit = getIt<AuthCubit>();
+    final cubit = getIt<SignUpCubit>();
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: CommonAppBar(),
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 20.w),
-          child: BlocBuilder<AuthCubit, AuthState>(
+          child: BlocBuilder<SignUpCubit, SignUpState>(
             buildWhen: (previous, current) =>
                 previous.createPasswordError != current.createPasswordError ||
                 previous.confirmPasswordError != current.confirmPasswordError ||
