@@ -1,5 +1,6 @@
 import 'package:park_my_whip/src/core/data/result.dart';
 import 'package:park_my_whip/src/core/models/email_check_result.dart';
+import 'package:park_my_whip/src/core/models/signup_eligibility_result.dart';
 import 'package:park_my_whip/src/core/models/supabase_user_model.dart';
 
 /// Repository interface for authentication operations
@@ -8,6 +9,14 @@ abstract class AuthRepository {
   /// Check if email exists and has access to the specified app
   /// Returns [EmailCheckResult] with status and user info if exists
   Future<Result<EmailCheckResult>> checkEmailForApp({
+    required String email,
+    required String appId,
+  });
+
+  /// Check signup eligibility for an email
+  /// Automatically grants app access if user exists in another app
+  /// Returns [SignupEligibilityResult] indicating if user can signup or should login
+  Future<Result<SignupEligibilityResult>> checkSignupEligibility({
     required String email,
     required String appId,
   });

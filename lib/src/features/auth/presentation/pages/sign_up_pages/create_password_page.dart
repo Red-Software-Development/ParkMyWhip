@@ -63,11 +63,7 @@ class CreatePasswordPage extends StatelessWidget {
                     onChanged: (_) => cubit.onCreatePasswordFieldChanged(),
                     isPassword: true,
                   ),
-                  verticalSpace(24),
-                  PasswordValidationRules(
-                    password: cubit.createPasswordController.text,
-                  ),
-                  verticalSpace(4),
+                   verticalSpace(4),
                   Visibility(
                     visible: state.errorMessage != null,
                     child: Text(
@@ -75,6 +71,11 @@ class CreatePasswordPage extends StatelessWidget {
                       style: AppTextStyles.urbanistFont12Red500Regular1_5,
                     ),
                   ),
+                  verticalSpace(18),
+                  PasswordValidationRules(
+                    password: cubit.createPasswordController.text,
+                  ),
+                 
                   Spacer(),
                   CommonButton(
                     text: state.isLoading ? 'Creating Account...' : AuthStrings.continueText,

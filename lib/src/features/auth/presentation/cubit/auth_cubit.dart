@@ -82,40 +82,39 @@ class AuthCubit extends Cubit<app_auth.AuthState> {
       errorMessage: null,
     ));
 
-    // Check if email already exists for this app
+    // Check signup eligibility (calls RPC that grants app access if user exists)
     final email = signUpEmailController.text.trim();
-    final result = await _authRepository.checkEmailForApp(
+    final result = await _authRepository.checkSignupEligibility(
       email: email,
       appId: AppConfig.appId,
     );
 
     switch (result) {
       case Success(:final data):
-        switch (data.status) {
-          case EmailCheckStatus.userNotFound:
-            // User doesn't exist - can proceed with sign up
-            AppLogger.auth('Email not found, proceeding with sign up');
-            emit(state.copyWith(isLoading: false));
-            if (context.mounted) {
-              Navigator.pushNamed(context, RoutesName.createPassword);
-            }
-          case EmailCheckStatus.userExistsWithAppAccess:
-            // User exists and has app access - should login instead
-            AppLogger.auth('User already exists with app access');
-            emit(state.copyWith(isLoading: false, errorMessage: ErrorStrings.accountAlreadyExists));
-          case EmailCheckStatus.userExistsNoAppAccess:
-            // User exists but no app access - redirect to login to link account
-            AppLogger.auth('User exists but no app access - redirecting to login');
-            // Pre-fill login email so user doesn't have to re-enter
-            loginEmailController.text = email;
-            // Emit state with the info message, then navigate
-            emit(state.copyWith(isLoading: false, loginGeneralError: ErrorStrings.noAppAccess));
-            if (context.mounted) {
-              Navigator.pushNamed(context, RoutesName.login);
-            }
+        if (data.canSignup) {
+          // New user - can proceed with signup
+          AppLogger.auth('New user - proceeding with signup');
+          emit(state.copyWith(isLoading: false));
+          if (context.mounted) {
+            Navigator.pushNamed(context, RoutesName.createPassword);
+          }
+        } else {
+          // Existing user - app access was granted by RPC, redirect to login
+          AppLogger.auth('Existing user - app access granted, redirecting to login');
+          // Pre-fill login email
+          loginEmailController.text = email;
+          // Navigate to login with message
+          emit(state.copyWith(
+            isLoading: false,
+            redirectEmail: email,
+            loginGeneralError: 'This account now exists. Please sign in to access this app.',
+          ));
+          if (context.mounted) {
+            Navigator.pushNamed(context, RoutesName.login);
+          }
         }
       case Failure(:final message):
-        AppLogger.auth('Email check failed: $message');
+        AppLogger.auth('Signup eligibility check failed: $message');
         emit(state.copyWith(isLoading: false, errorMessage: message));
     }
   }
@@ -288,6 +287,18 @@ class AuthCubit extends Cubit<app_auth.AuthState> {
     final hasEmail = loginEmailController.text.trim().isNotEmpty;
     final hasPassword = loginPasswordController.text.trim().isNotEmpty;
     final shouldEnable = hasEmail && hasPassword;
+    
+    // Clear old errors when user starts typing
+    if (state.loginGeneralError != null || 
+        state.loginEmailError != null || 
+        state.loginPasswordError != null) {
+      emit(state.copyWith(
+        clearLoginGeneralError: true,
+        loginEmailError: null,
+        loginPasswordError: null,
+      ));
+    }
+    
     if (state.isLoginButtonEnabled != shouldEnable) {
       emit(state.copyWith(isLoginButtonEnabled: shouldEnable));
     }

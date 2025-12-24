@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:park_my_whip/src/core/helpers/app_logger.dart';
+import 'package:park_my_whip/src/core/models/user_app_model.dart';
 
 class SupabaseUserModel {
   final String id;
@@ -11,6 +12,7 @@ class SupabaseUserModel {
   final Map<String, dynamic> metadata;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final UserAppModel? userApp;
 
   const SupabaseUserModel({
     required this.id,
@@ -22,6 +24,7 @@ class SupabaseUserModel {
     this.avatarUrl,
     this.phoneNumber,
     this.metadata = const <String, dynamic>{},
+    this.userApp,
   });
 
   SupabaseUserModel copyWith({
@@ -34,6 +37,7 @@ class SupabaseUserModel {
     Map<String, dynamic>? metadata,
     DateTime? createdAt,
     DateTime? updatedAt,
+    UserAppModel? userApp,
   }) {
     return SupabaseUserModel(
       id: id ?? this.id,
@@ -45,10 +49,14 @@ class SupabaseUserModel {
       metadata: metadata ?? Map<String, dynamic>.from(this.metadata),
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      userApp: userApp ?? this.userApp,
     );
   }
 
-  factory SupabaseUserModel.fromJson(Map<String, dynamic> json) {
+  factory SupabaseUserModel.fromJson(
+    Map<String, dynamic> json, {
+    UserAppModel? userApp,
+  }) {
     return SupabaseUserModel(
       id: json['id'] as String? ?? '',
       email: json['email'] as String? ?? '',
@@ -59,6 +67,7 @@ class SupabaseUserModel {
       metadata: _safeMetadata(json['metadata']),
       createdAt: _parseDate(json['createdAt'] ?? json['created_at']),
       updatedAt: _parseDate(json['updatedAt'] ?? json['updated_at']),
+      userApp: userApp,
     );
   }
 

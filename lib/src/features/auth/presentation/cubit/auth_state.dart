@@ -21,6 +21,7 @@ class AuthState extends Equatable {
   final String? loginPasswordError;
   final String? loginGeneralError;
   final bool isLoginButtonEnabled;
+  final String? redirectEmail; // Email to pre-fill on login page after signup eligibility check
   // forgot password
   final String? forgotPasswordEmailError;
   final bool isForgotPasswordButtonEnabled;
@@ -52,6 +53,7 @@ class AuthState extends Equatable {
     this.loginPasswordError,
     this.loginGeneralError,
     this.isLoginButtonEnabled = false,
+    this.redirectEmail,
     this.forgotPasswordEmailError,
     this.isForgotPasswordButtonEnabled = false,
     this.resendCountdownSeconds = 60,
@@ -82,6 +84,8 @@ class AuthState extends Equatable {
     String? loginGeneralError,
     bool clearLoginGeneralError = false,
     bool? isLoginButtonEnabled,
+    String? redirectEmail,
+    bool clearRedirectEmail = false,
     String? forgotPasswordEmailError,
     bool? isForgotPasswordButtonEnabled,
     int? resendCountdownSeconds,
@@ -112,6 +116,7 @@ class AuthState extends Equatable {
       loginPasswordError: loginPasswordError,
       isLoginButtonEnabled: isLoginButtonEnabled ?? this.isLoginButtonEnabled,
       loginGeneralError: clearLoginGeneralError ? null : (loginGeneralError ?? this.loginGeneralError),
+      redirectEmail: clearRedirectEmail ? null : (redirectEmail ?? this.redirectEmail),
       forgotPasswordEmailError: forgotPasswordEmailError,
       isForgotPasswordButtonEnabled:
           isForgotPasswordButtonEnabled ?? this.isForgotPasswordButtonEnabled,
@@ -144,6 +149,7 @@ class AuthState extends Equatable {
     loginPasswordError,
     loginGeneralError,
     isLoginButtonEnabled,
+    redirectEmail,
     forgotPasswordEmailError,
     isForgotPasswordButtonEnabled,
     resendCountdownSeconds,

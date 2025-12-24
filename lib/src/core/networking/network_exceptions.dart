@@ -166,7 +166,7 @@ abstract class NetworkExceptions {
     }
 
     if (code == '23503') {
-      return 'Cannot delete this record as it is referenced by other data.';
+      return 'A required related record is missing. Please contact support.';
     }
 
     if (code == '42501' || message.contains('permission denied')) {

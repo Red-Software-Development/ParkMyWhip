@@ -12,8 +12,27 @@ import 'package:park_my_whip/src/features/auth/presentation/cubit/auth_state.dar
 import 'package:park_my_whip/src/features/auth/presentation/widgets/dont_have_account_text.dart';
 import 'package:park_my_whip/src/features/auth/presentation/widgets/forgot_password.dart';
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  @override
+  void initState() {
+    super.initState();
+    // Pre-fill email if redirected from signup
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final cubit = getIt<AuthCubit>();
+      if (cubit.state.redirectEmail != null) {
+        cubit.loginEmailController.text = cubit.state.redirectEmail!;
+        // Clear redirect email after using it
+        cubit.emit(cubit.state.copyWith(clearRedirectEmail: true));
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

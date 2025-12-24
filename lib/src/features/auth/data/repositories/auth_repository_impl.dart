@@ -1,6 +1,7 @@
 import 'package:park_my_whip/src/core/data/result.dart';
 import 'package:park_my_whip/src/core/helpers/app_logger.dart';
 import 'package:park_my_whip/src/core/models/email_check_result.dart';
+import 'package:park_my_whip/src/core/models/signup_eligibility_result.dart';
 import 'package:park_my_whip/src/core/models/supabase_user_model.dart';
 import 'package:park_my_whip/src/core/networking/network_exceptions.dart';
 import 'package:park_my_whip/src/features/auth/data/data_sources/auth_local_data_source.dart';
@@ -35,6 +36,29 @@ class AuthRepositoryImpl implements AuthRepository {
       return Success(result);
     } catch (e, stackTrace) {
       AppLogger.error('Email check failed',
+          name: 'AuthRepository', error: e, stackTrace: stackTrace);
+      return Failure(_getErrorMessage(e), e as Exception?);
+    }
+  }
+
+  @override
+  Future<Result<SignupEligibilityResult>> checkSignupEligibility({
+    required String email,
+    required String appId,
+  }) async {
+    try {
+      final result = await _remoteDataSource.checkSignupEligibility(
+        email: email,
+        appId: appId,
+      );
+
+      AppLogger.auth(
+        'Signup eligibility check completed: canSignup=${result.canSignup}, '
+        'hasAppAccess=${result.hasAppAccess}',
+      );
+      return Success(result);
+    } catch (e, stackTrace) {
+      AppLogger.error('Signup eligibility check failed',
           name: 'AuthRepository', error: e, stackTrace: stackTrace);
       return Failure(_getErrorMessage(e), e as Exception?);
     }

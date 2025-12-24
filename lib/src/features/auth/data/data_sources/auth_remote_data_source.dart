@@ -1,4 +1,5 @@
 import 'package:park_my_whip/src/core/models/email_check_result.dart';
+import 'package:park_my_whip/src/core/models/signup_eligibility_result.dart';
 import 'package:park_my_whip/src/core/models/supabase_user_model.dart';
 
 /// Abstract contract for authentication remote data source
@@ -7,6 +8,15 @@ abstract class AuthRemoteDataSource {
   /// Check if email exists and has app access
   /// Uses RPC function to check both user and user_apps tables
   Future<EmailCheckResult> checkEmailForApp({
+    required String email,
+    required String appId,
+  });
+
+  /// Check signup eligibility and grant app access if user exists
+  /// Uses RPC 'check_user_and_grant_app_access' function
+  /// Returns [SignupEligibilityResult] with eligibility status
+  /// Throws exception on failure
+  Future<SignupEligibilityResult> checkSignupEligibility({
     required String email,
     required String appId,
   });
